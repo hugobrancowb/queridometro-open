@@ -5,11 +5,10 @@ import React, { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 import * as FirebaseService from '../services/FirebaseService'
 import { User } from "../models/models";
-import {useRouter} from "next/router";
+import Vote from "../components/vote/vote";
+import SelectUser from "../components/selectUser/selectUser";
 
 export default function Home() {
-  const router = useRouter();
-  
   const [user, setUser] = useState(-1);
   const [userList, setUserList] = useState([]);
   
@@ -32,11 +31,30 @@ export default function Home() {
     
     setUser(selectedUser);
     filterSelectedUser(selectedUser);
-    router.push('/vote')
   }
   
+  /**
+   * Filtra para que a lista não tenha o nome do usuário que está vontado.
+   *
+   * @param userName Nome do usuário ativo.
+   * @returns Lista de usuários filtrada.
+   */
   const filterSelectedUser = (userName: string): User[] => {
     return userList.filter(user => user.name !== userName);
+  }
+  
+  /**
+   * Informa se um usuário já foi selecionado.
+   *
+   * @returns Retorna boolean informando se há usuário selecionado.
+   */
+  const isUserSelected = (): JSX.Element => {
+    if ((user === null) || (user === -1)) {
+      // Selecionar usuário.
+      return SelectUser(user, userList, handleUserSelect);
+    }
+    // Usuário selecionado. Hora de votar.
+    return Vote();
   }
   
   /**
@@ -53,23 +71,8 @@ export default function Home() {
           <h1 className="title">
             Queridômetro Justa
           </h1>
-          
-          <div className={ style.userSelect }>
-            <Form>
-              <Form.Group className={ style.formGroup } controlId='selectUser'>
-                <Form.Label>Quem é você?</Form.Label>
-                <Form.Control as='select' value={ user } onChange={ handleUserSelect } >
-                  <option disabled value={-1} key={-1}>Busque seu nome</option>
-                  {
-                    userList.map((user, index) =>
-                        <option value={ user.name } key={ user.name }>
-                          { user.label }
-                        </option>)
-                  }
-                </Form.Control>
-              </Form.Group>
-            </Form>
-          </div>
+  
+          { isUserSelected() }
         
         </main>
       </div>
