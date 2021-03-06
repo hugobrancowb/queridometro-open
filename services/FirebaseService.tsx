@@ -1,15 +1,14 @@
 import axios from "axios";
+import { User } from '../models/models'
+
+const FIREBASE_URL = 'https://queridometro-justa-default-rtdb.firebaseio.com';
 
 /**
- * Primeira requisição de teste tipo GET.
+ * Retorna lista de usuários cadastrados no sistema.
  *
- * @returns Lista de strings.
+ * @returns Lista de usuários.
  */
-export const GETMockData = (): Promise<string[]> => {
-  return axios.get('https://jsonplaceholder.typicode.com/users')
-      .then(res => {
-        const data: any[] = res.data;
-        const names: string[] = data.map(item => item.username);
-        return names.slice(0, 3);
-      })
+export const GETUsers = (): Promise<User[]> => {
+  return axios.get(`${FIREBASE_URL}/users.json`)
+      .then(res => res.data)
 }
