@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import * as FirebaseService from '../services/FirebaseService';
@@ -10,6 +9,7 @@ export default function Home() {
   const [user, setUser] = useState<string | number>(null);
   const [selectedState, setSelectedState] = useState<boolean>(false);
   const [userList, setUserList] = useState<User[]>([]);
+  const [password, setPassword] = useState<string>(null);
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
   const [emojisList, setEmojisList] = useState<Emoji[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -53,6 +53,14 @@ export default function Home() {
 
     setUserList([...userList]);
   };
+  
+  /**
+   * Altera a senha usada para votar.
+   * @param event
+   */
+  const handlePassword = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setPassword(event.target.value);
+  }
 
   /**
    * Registra os votos do queridômetro no banco.
@@ -60,6 +68,7 @@ export default function Home() {
    */
   const handleSubmit = (event: any) => {
     console.log(userList);
+    console.log('password: ', password);
   };
 
   /**
@@ -88,28 +97,39 @@ export default function Home() {
       setSelectedState(true);
     }
   }, [user]);
-  
-  const voteProps = {filteredUserList, handleVoting, handleSubmit, showAlert, setShowAlert};
+
+  const voteProps = {
+    filteredUserList,
+    handleVoting,
+    handleSubmit,
+    handlePassword,
+    showAlert,
+    setShowAlert,
+  };
 
   /**
    * PÁGINA.
    */
   return (
-    <div className="container">
+    <>
       <Head>
-        <title>Queridômetro Justa</title>
+        <title>{pageTitle}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <h1 className="title">Queridômetro Justa</h1>
+      <div className="container mx-auto p-4">
+        <h1 className="text-5xl font-sans text-center font-semibold">
+          {pageTitle}
+        </h1>
+      </div>
 
-        {SelectUser(user, userList, handleUserSelect)}
+      <div className="container mx-auto">
+        <div className="row justify-center">
+          {SelectUser(user, userList, handleUserSelect)}
 
-        {selectedState
-          ? Vote({...voteProps})
-          : null}
-      </main>
-    </div>
+          {selectedState ? Vote({ ...voteProps }) : null}
+        </div>
+      </div>
+    </>
   );
 }

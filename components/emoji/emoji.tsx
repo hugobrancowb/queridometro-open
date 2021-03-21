@@ -1,14 +1,36 @@
-import { Emoji } from '../../models/models'
+export default function Emoji(props) {
+  const { user, emoji, index, handleVoting } = props;
 
-export default function Emoji(emoji: Emoji) {
-  return(
-      <span
-          className="emoji"
-          role="img"
-          aria-label={emoji.label ?? ""}
-          aria-hidden={emoji.label ? "false" : "true"}
+  return (
+    <>
+      <label
+        className={`transform flex justify-center
+        ${emoji?.votes > 0 ? 'scale-110' : 'blackAndWhite'}`}
+        key={index}
       >
-        { emoji.symbol }
-    </span>
-  )
+        <input
+          type="radio"
+          name={user.label}
+          value={emoji.label}
+          onChange={() => handleVoting(user.name, emoji.symbol)}
+        />
+        <span className="cursor-pointer m-5 transition transform hover:text-shadow-xl hover:scale-125">
+          {emoji.symbol}
+        </span>
+      </label>
+      <style jsx>{`
+        label.blackAndWhite {
+          filter: grayscale(100%);
+          opacity: 0.5;
+        }
+        /* HIDE RADIO */
+        input[type='radio'] {
+          position: absolute;
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+      `}</style>
+    </>
+  );
 }

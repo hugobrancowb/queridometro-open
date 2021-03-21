@@ -1,5 +1,3 @@
-import { User } from '../../models/models';
-import { Button, Col, Row } from 'react-bootstrap';
 import Dialog from '@material-ui/core/Dialog';
 import {
   DialogActions,
@@ -7,76 +5,82 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
+import { Button } from '../../dummy-system';
+import Emoji from '../emoji/emoji';
 
 export default function Vote(voteProps) {
   const {
     filteredUserList,
     handleVoting,
     handleSubmit,
+    handlePassword,
     showAlert,
     setShowAlert,
   } = voteProps;
 
-  /**
-   * COMPONENTE.
-   */
+  const photoExample =
+    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MXwxMjA3fDB8MHxzZWFyY2h8NXx8cG9ydHJhaXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60';
+  
   return (
     <>
-      <div className="container-fluid d-flex justify-content-center flex-column">
+      <div
+        className={`py-4 container w-full md:max-w-lg md:mx-auto flex flex-col justify-center grid grid-rows-${filteredUserList.length}`}
+      >
         {filteredUserList.map((user, index) => (
-          <div className="d-flex userRow flex-row" key={index}>
-            {/* Nome do participante */}
-            <Col xs={3} className="d-flex justify-content-end">
-              <span className="userName">{user.label}</span>
-            </Col>
+          <div
+            className={`row justify-center grid grid-cols-${
+              user.emojiList.length + 2
+            } text-2xl items-center py-2 gap-1`}
+            key={index}
+          >
+            {/* Foto do participante */}
+            <div className="col-span-2 flex justify-center">
+              <div
+                className="w-1/2 p-6 shadow rounded-full"
+                style={{
+                  background: `url("${photoExample}") no-repeat center center`,
+                  backgroundSize: 'cover',
+                }}
+              />
+            </div>
 
             {/* Lista de emojis/reações */}
-            <Col xs={9} className="d-flex">
-              {user.emojiList.map((emoji, index) => (
-                <label
-                  className={emoji?.votes > 0 ? '' : 'blackAndWhite'}
-                  key={index}
-                >
-                  <input
-                    type="radio"
-                    name={user.label}
-                    value={emoji.label}
-                    onChange={() => handleVoting(user.name, emoji.symbol)}
-                  />
-                  <span className="emoji">{emoji.symbol}</span>
-                </label>
-              ))}
-            </Col>
+            {user.emojiList.map((emoji, index) =>
+              Emoji({ emoji, user, index, handleVoting }),
+            )}
           </div>
         ))}
+      </div>
 
-        <Row>
-          <Col xs={2}></Col>
-          <Col xs={10} className="d-flex justify-content-center">
-            <Button
-              onClick={() => {
-                setShowAlert(true);
-              }}
-            >
-              Enviar
-            </Button>
-          </Col>
-        </Row>
+      <div className="flex justify-center w-full md:max-w-xs md:mx-auto">
+        <Button
+          primary
+          onClick={() => {
+            setShowAlert(true);
+          }}
+        >
+          Enviar
+        </Button>
       </div>
 
       {/* Alerta de confirmação */}
       <Dialog open={showAlert} aria-labelledby="Confirmação de voto">
-        <DialogTitle>Você confirma seus votos?</DialogTitle>
+        <DialogTitle>Digite a palavra-passe do dia</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Você não poderá alterar seus votos depois de confirmar. Deseja
-            prosseguir?
+            Para a segurança das votações, é definida uma palavra-chave diferente para cada votação do queridômetro.
+            Digite abaixo a palavra passe do dia.
           </DialogContentText>
+          
+          <div className='flex justify-center w-full md:mx-auto md:max-w-md'>
+          <input className='rounded-md' type='password' onChange={handlePassword}/>
+          </div>
+          
         </DialogContent>
 
         <DialogActions>
           <Button
-            color="secondary"
+            secondary
             onClick={() => {
               setShowAlert(false);
             }}
@@ -85,55 +89,16 @@ export default function Vote(voteProps) {
           </Button>
           <Button
             autoFocus
-            color="primary"
-            onClick={(e) => {
+            primary
+            onClick={e => {
               setShowAlert(false);
-              handleSubmit(e)
+              handleSubmit(e);
             }}
           >
             Sim
           </Button>
         </DialogActions>
       </Dialog>
-
-      <style jsx>{`
-        .userRow {
-          font-size: 22px;
-          margin: 10px auto;
-        }
-        .userName {
-          margin-right: 5px;
-          text-align: right;
-          position: relative;
-          top: 5px;
-        }
-        label,
-        .emoji {
-          margin: 5px;
-          cursor: pointer;
-          transition: all 0.05s ease-in-out;
-        }
-        label:hover,
-        .emoji:hover {
-          transform: scale(1.2);
-          text-shadow: 0px 1px 2px rgb(0 0 0 / 30%);
-        }
-        label {
-          filter: none;
-          opacity: 1;
-        }
-        label.blackAndWhite {
-          filter: grayscale(100%);
-          opacity: 0.8;
-        }
-        /* HIDE RADIO */
-        input[type='radio'] {
-          position: absolute;
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-      `}</style>
     </>
   );
 }

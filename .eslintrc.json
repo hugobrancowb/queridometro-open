@@ -26,7 +26,6 @@
   "rules": {
     "prettier/prettier": "error",
     "indent": [2, 2],
-    "quotes": ["error","preffer-single"],
     "jsx-quotes": ["error","preffer-single"],
     "@typescript-eslint/indent": ["error", 2]
   }
