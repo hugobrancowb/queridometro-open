@@ -55,51 +55,21 @@ export default function Vote(voteProps) {
         </div>
       ))}
 
-      <div className="flex justify-center w-full md:max-w-xs md:mx-auto">
-        <Button
-          primary
-          type="button"
-          onClick={() => {
-            setShowAlert(true);
-          }}
-        >
+      <div className="flex justify-center w-full md:max-w-xs md:mx-auto grid grid-cols-8 gap-1">
+        <input
+          placeholder="Palavra-chave"
+          className={`col-span-5 rounded-md ${
+            form.errors['password'] && form.touched['password']
+              ? 'border-red-600'
+              : ''
+          }`}
+          type="password"
+          onChange={handlePassword}
+        />
+        <Button primary type="submit" className="col-span-3">
           Enviar
         </Button>
       </div>
-
-      {/* Alerta de confirmação */}
-      <Dialog open={showAlert} aria-labelledby="Confirmação de voto">
-        <DialogTitle>Digite a palavra-passe do dia</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Para a segurança das votações, é definida uma palavra-chave
-            diferente para cada votação do queridômetro. Digite abaixo a palavra
-            passe do dia.
-          </DialogContentText>
-
-          <div className="flex justify-center w-full md:mx-auto md:max-w-md">
-            <input
-              className="rounded-md"
-              type="password"
-              onChange={handlePassword}
-            />
-          </div>
-        </DialogContent>
-
-        <DialogActions>
-          <Button
-            secondary
-            onClick={() => {
-              setShowAlert(false);
-            }}
-          >
-            Não
-          </Button>
-          <Button autoFocus primary type="submit" onClick={form.handleSubmit}>
-            Sim
-          </Button>
-        </DialogActions>
-      </Dialog>
     </form>
   );
 }

@@ -15,10 +15,14 @@ export default function Home() {
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
   const [emojisList, setEmojisList] = useState<Emoji[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [validationSchema, setValidationSchema] = useState<any>(Yup.object().shape({}))
+  const [validationSchema, setValidationSchema] = useState<any>(
+    Yup.object().shape({
+      password: Yup.string().required('Palavra-chave é obrigratória'),
+    }),
+  );
 
   const pageTitle = 'Queridômetro';
-  
+
   const form = useFormik({
     initialValues: null,
     onSubmit: values => {
@@ -82,27 +86,32 @@ export default function Home() {
   /** Reconstroi o formulário cada vez que um usuário diferente é selecionado. */
   const buildForm = useCallback(
     (filteredUserList: User[]) => {
-      const _initialValues = {};
+      const _initialValues = { password: password };
       filteredUserList.forEach(user => {
         _initialValues[user.name] = null;
       });
 
       form.setValues(_initialValues);
-
-      console.log('build: ', form);
     },
     [filteredUserList],
   );
-  
-  const buildValidationSchema = useCallback((filteredUserList: User[]) => {
-    const _validationSchema = {};
-  
-    filteredUserList.forEach(user => {
-      _validationSchema[user.name] = Yup.string().required("Campo obrigatório");
-    });
-    
-    setValidationSchema(Yup.object().shape(_validationSchema));
-  }, [filteredUserList]);
+
+  const buildValidationSchema = useCallback(
+    (filteredUserList: User[]) => {
+      const _validationSchema = {
+        password: Yup.string().required('Palavra-chave é obrigratória'),
+      };
+
+      filteredUserList.forEach(user => {
+        _validationSchema[user.name] = Yup.string().required(
+          'Campo obrigatório',
+        );
+      });
+
+      setValidationSchema(Yup.object().shape(_validationSchema));
+    },
+    [filteredUserList],
+  );
 
   useEffect(onRender, []);
   useEffect(() => {
