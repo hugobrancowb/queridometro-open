@@ -1,21 +1,8 @@
-import Dialog from '@material-ui/core/Dialog';
-import {
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@material-ui/core';
 import { Button } from '../../dummy-system';
 import Emoji from '../emoji/emoji';
 
 export default function Vote(voteProps) {
-  const {
-    form,
-    filteredUserList,
-    handlePassword,
-    showAlert,
-    setShowAlert,
-  } = voteProps;
+  const { form, filteredUserList } = voteProps;
 
   return (
     <form
@@ -55,16 +42,17 @@ export default function Vote(voteProps) {
         </div>
       ))}
 
-      <div className="flex justify-center w-full md:max-w-xs md:mx-auto grid grid-cols-8 gap-1">
+      <div className="flex justify-center w-full pt-4 md:max-w-xs md:mx-auto grid grid-cols-8 gap-1">
         <input
           placeholder="Palavra-chave"
+          name="password"
+          type="password"
+          onChange={form.handleChange}
           className={`col-span-5 rounded-md ${
-            form.errors['password'] && form.touched['password']
+            form.errors?.password && form.touched?.password
               ? 'border-red-600'
               : ''
           }`}
-          type="password"
-          onChange={handlePassword}
         />
         <Button primary type="submit" className="col-span-3">
           Enviar

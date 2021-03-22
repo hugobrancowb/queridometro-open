@@ -1,23 +1,25 @@
 import Head from 'next/head';
 import React, { useCallback, useEffect, useState } from 'react';
 import * as FirebaseService from '../services/FirebaseService';
+import * as Yup from 'yup';
 import SelectUser from '../components/selectUser/selectUser';
 import Vote from '../components/vote/vote';
 import { Emoji, User } from '../models/models';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 
 export default function Home() {
+  const passwordfield = {
+    password: Yup.string().required('Palavra-chave é obrigratória'),
+  };
+
   const [user, setUser] = useState<string | number>(null);
   const [selectedState, setSelectedState] = useState<boolean>(false);
   const [userList, setUserList] = useState<User[]>([]);
-  const [password, setPassword] = useState<string>(null);
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
   const [emojisList, setEmojisList] = useState<Emoji[]>([]);
-  const [showAlert, setShowAlert] = useState<boolean>(false);
   const [validationSchema, setValidationSchema] = useState<any>(
     Yup.object().shape({
-      password: Yup.string().required('Palavra-chave é obrigratória'),
+      ...passwordfield,
     }),
   );
 
@@ -26,7 +28,6 @@ export default function Home() {
   const form = useFormik({
     initialValues: null,
     onSubmit: values => {
-      setShowAlert(false);
       console.log('values: ', values);
       console.log('is valid: ', form.isValid);
       console.log('schema: ', form);
@@ -58,14 +59,6 @@ export default function Home() {
   };
 
   /**
-   * Altera a senha usada para votar.
-   * @param event
-   */
-  const handlePassword = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setPassword(event.target.value);
-  };
-
-  /**
    * Cria objeto utilizado para contabilizar votos do queridômetro ao
    * associar os emojis pré-definidos aos usuários cadastrados no sistema.
    *
@@ -86,7 +79,7 @@ export default function Home() {
   /** Reconstroi o formulário cada vez que um usuário diferente é selecionado. */
   const buildForm = useCallback(
     (filteredUserList: User[]) => {
-      const _initialValues = { password: password };
+      const _initialValues = { password: form?.values?.password ?? null };
       filteredUserList.forEach(user => {
         _initialValues[user.name] = null;
       });
@@ -99,7 +92,7 @@ export default function Home() {
   const buildValidationSchema = useCallback(
     (filteredUserList: User[]) => {
       const _validationSchema = {
-        password: Yup.string().required('Palavra-chave é obrigratória'),
+        ...passwordfield,
       };
 
       filteredUserList.forEach(user => {
@@ -127,9 +120,6 @@ export default function Home() {
   const voteProps = {
     form,
     filteredUserList,
-    handlePassword,
-    showAlert,
-    setShowAlert,
   };
 
   /**
@@ -148,7 +138,7 @@ export default function Home() {
         </h1>
       </div>
 
-      <div className="container mx-auto">
+      <div className="container mx-auto px-6 md:px-0">
         <div className="row justify-center">
           {SelectUser(user, userList, handleUserSelect)}
 
