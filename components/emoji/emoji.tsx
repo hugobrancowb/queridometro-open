@@ -1,18 +1,22 @@
 export default function Emoji(props) {
-  const { user, emoji, index, handleVoting } = props;
+  const { user, emoji, form } = props;
 
   return (
     <>
       <label
         className={`transform flex justify-center
-        ${emoji?.votes > 0 ? 'scale-110' : 'blackAndWhite'}`}
-        key={index}
+        ${
+          form.values[user.name] === emoji?.symbol
+            ? 'scale-110'
+            : 'blackAndWhite'
+        }`}
+        key={emoji?.symbol + user?.name}
       >
         <input
           type="radio"
-          name={user.label}
-          value={emoji.label}
-          onChange={() => handleVoting(user.name, emoji.symbol)}
+          name={user.name}
+          value={emoji.symbol}
+          onChange={form.handleChange}
         />
         <span className="cursor-pointer m-5 transition transform hover:text-shadow-xl hover:scale-125">
           {emoji.symbol}

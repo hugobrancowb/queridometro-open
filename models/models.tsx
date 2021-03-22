@@ -4,10 +4,13 @@
 export interface User {
   /** Nome formatado para exibição. */
   label: string;
-  
+
   /** Nome em formato simplificado (lowercase, sem espaços, etc). */
   name: string;
-  
+
+  /** Foto do participante. */
+  photo?: string;
+
   /** Reações associadas ao usuário. */
   emojiList?: Emoji[];
 }
@@ -18,10 +21,10 @@ export interface User {
 export interface Emoji {
   /** Nome formatado para exibição. */
   label: string;
-  
+
   /** Emoji. */
   symbol: string;
-  
+
   /** Quantidade de votos associados ao emoji. */
   votes?: number;
 }

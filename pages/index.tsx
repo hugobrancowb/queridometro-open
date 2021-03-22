@@ -1,9 +1,11 @@
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import * as FirebaseService from '../services/FirebaseService';
 import SelectUser from '../components/selectUser/selectUser';
 import Vote from '../components/vote/vote';
 import { Emoji, User } from '../models/models';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 export default function Home() {
   const [user, setUser] = useState<string | number>(null);
@@ -13,6 +15,21 @@ export default function Home() {
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
   const [emojisList, setEmojisList] = useState<Emoji[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [validationSchema, setValidationSchema] = useState<any>(Yup.object().shape({}))
+
+  const pageTitle = 'Queridômetro';
+  
+  const form = useFormik({
+    initialValues: null,
+    onSubmit: values => {
+      setShowAlert(false);
+      console.log('values: ', values);
+      console.log('is valid: ', form.isValid);
+      console.log('schema: ', form);
+    },
+    validationSchema: validationSchema,
+    validateOnChange: true,
+  });
 
   /**
    * Função chamada ao carregar a página.
@@ -37,38 +54,11 @@ export default function Home() {
   };
 
   /**
-   * Registra cada voto construindo o body da requisição dinamicamente.
-   * @param userName
-   * @param emojiSymbol
-   */
-  const handleVoting = (userName: string, emojiSymbol: string): void => {
-    userList
-      .filter(user => user.name === userName)
-      .forEach(user => {
-        user.emojiList.map(emoji => {
-          emoji.votes = emoji.symbol === emojiSymbol ? 1 : 0;
-          return emoji;
-        });
-      });
-
-    setUserList([...userList]);
-  };
-  
-  /**
    * Altera a senha usada para votar.
    * @param event
    */
   const handlePassword = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setPassword(event.target.value);
-  }
-
-  /**
-   * Registra os votos do queridômetro no banco.
-   * @param event
-   */
-  const handleSubmit = (event: any) => {
-    console.log(userList);
-    console.log('password: ', password);
   };
 
   /**
@@ -89,19 +79,45 @@ export default function Home() {
     return [];
   };
 
+  /** Reconstroi o formulário cada vez que um usuário diferente é selecionado. */
+  const buildForm = useCallback(
+    (filteredUserList: User[]) => {
+      const _initialValues = {};
+      filteredUserList.forEach(user => {
+        _initialValues[user.name] = null;
+      });
+
+      form.setValues(_initialValues);
+
+      console.log('build: ', form);
+    },
+    [filteredUserList],
+  );
+  
+  const buildValidationSchema = useCallback((filteredUserList: User[]) => {
+    const _validationSchema = {};
+  
+    filteredUserList.forEach(user => {
+      _validationSchema[user.name] = Yup.string().required("Campo obrigatório");
+    });
+    
+    setValidationSchema(Yup.object().shape(_validationSchema));
+  }, [filteredUserList]);
+
   useEffect(onRender, []);
   useEffect(() => {
     if (user !== null) {
       const _users = userList.filter(u => u.name !== user);
       setFilteredUserList(buildNewVoteObject(_users, emojisList));
       setSelectedState(true);
+      buildForm(_users);
+      buildValidationSchema(_users);
     }
   }, [user]);
 
   const voteProps = {
+    form,
     filteredUserList,
-    handleVoting,
-    handleSubmit,
     handlePassword,
     showAlert,
     setShowAlert,
@@ -117,7 +133,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-8 mb-8">
         <h1 className="text-5xl font-sans text-center font-semibold">
           {pageTitle}
         </h1>
