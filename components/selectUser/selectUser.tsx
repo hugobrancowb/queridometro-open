@@ -13,7 +13,7 @@ export default function SelectUser(
       <div className="w-full md:max-w-xs md:mx-auto grid grid-rows-2">
         <label
           htmlFor="selectedUser"
-          className={`text-center ${user !== -1 ? 'opacity-0' : ''}`}
+          className={`text-center`}
         >
           Quem é você?
         </label>

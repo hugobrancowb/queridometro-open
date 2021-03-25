@@ -28,3 +28,10 @@ export interface Emoji {
   /** Quantidade de votos associados ao emoji. */
   votes?: number;
 }
+
+/**
+ * Model para uso genérico de um objeto com chave e valor em string.
+ */
+export interface GenericObject {
+  [key: string]: string;
+}

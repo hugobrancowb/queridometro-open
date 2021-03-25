@@ -1,52 +1,37 @@
 import Head from 'next/head';
 import React, { useCallback, useEffect, useState } from 'react';
-import * as FirebaseService from '../services/FirebaseService';
+import * as FirebaseService from '../services/firebase-service';
 import * as Yup from 'yup';
 import SelectUser from '../components/selectUser/selectUser';
 import Vote from '../components/vote/vote';
 import { Emoji, User } from '../models/models';
 import { useFormik } from 'formik';
 
-export default function Home() {
+export default function Home({ userList, emojisList }) {
   const passwordfield = {
     password: Yup.string().required('Palavra-chave é obrigratória'),
   };
 
   const [user, setUser] = useState<string | number>(null);
   const [selectedState, setSelectedState] = useState<boolean>(false);
-  const [userList, setUserList] = useState<User[]>([]);
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
-  const [emojisList, setEmojisList] = useState<Emoji[]>([]);
   const [validationSchema, setValidationSchema] = useState<any>(
     Yup.object().shape({
       ...passwordfield,
     }),
   );
 
-  const pageTitle = 'Queridômetro';
+  const pageTitle = 'Queridômetro Justa';
 
   const form = useFormik({
     initialValues: null,
-    onSubmit: values => {
+    onSubmit: async values => {
       console.log('values: ', values);
-      console.log('is valid: ', form.isValid);
-      console.log('schema: ', form);
+      FirebaseService.vote(values, userList);
     },
     validationSchema: validationSchema,
     validateOnChange: true,
   });
-
-  /**
-   * Função chamada ao carregar a página.
-   */
-  const onRender = (): void => {
-    FirebaseService.GETUsers().then(usersList => {
-      setUserList(usersList);
-      FirebaseService.GETEmojis().then(emojiList => {
-        setEmojisList(emojiList);
-      });
-    });
-  };
 
   /**
    * Reage à mudança gatilhada pela escolha de usuário.
@@ -64,7 +49,7 @@ export default function Home() {
    *
    * @param userList
    * @param emojiList
-   * @return Lista de usuários com 0 votos em todas reações.
+   * @returns Lista de usuários com 0 votos em todas reações.
    */
   const buildNewVoteObject = (userList: User[], emojiList: Emoji[]): User[] => {
     if (emojiList) {
@@ -106,7 +91,6 @@ export default function Home() {
     [filteredUserList],
   );
 
-  useEffect(onRender, []);
   useEffect(() => {
     if (user !== null) {
       const _users = userList.filter(u => u.name !== user);
@@ -132,7 +116,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="container mx-auto p-8 mb-8">
+      <div className="container mx-auto p-8">
         <h1 className="text-5xl font-sans text-center font-semibold">
           {pageTitle}
         </h1>
@@ -147,4 +131,28 @@ export default function Home() {
       </div>
     </>
   );
+}
+
+/**
+ * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
+ */
+export async function getStaticProps() {
+  let [userList, emojisList] = await Promise.all([
+    FirebaseService.getUsers(),
+    FirebaseService.getEmojis(),
+  ]);
+
+  emojisList.forEach(emoji => (emoji.votes = 0));
+
+  console.log('oi')
+  userList.forEach(user => {
+    user.emojiList = emojisList;
+  });
+
+  return {
+    props: {
+      userList,
+      emojisList,
+    },
+  };
 }
