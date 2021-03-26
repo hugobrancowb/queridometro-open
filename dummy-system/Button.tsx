@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React from 'react';
 
 const ButtonStyled = styled.button`
-  color: ${props => (props?.secondary ? '#222' : '#fff')};
+  color: ${props => (props['secondary'] ? '#222' : '#fff')};
 `;
 
 export default function Button({ ...props }) {

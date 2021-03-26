@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Emoji, GenericObject, User } from '../models/models';
+import {Emoji, GenericObject, User, VotesByDate} from '../models/models';
 import { dateNow } from './utils';
 
 /**
@@ -35,6 +35,18 @@ export const getVotesFromDate = async (date: string): Promise<User[]> => {
     .then(res => res?.data);
 
   return users ?? [];
+};
+
+/**
+ * Obtém todos os votos realizados.
+ * @returns Lista de usuários e seus votos recebidos, organizados por data.
+ */
+export const getAllVotes = async (): Promise<VotesByDate[]> => {
+  let votes: VotesByDate[] = await axios
+    .get(`${process.env.FIREBASE_URL}/history.json`)
+    .then(res => res?.data);
+
+  return votes ?? [];
 };
 
 export const vote = async (

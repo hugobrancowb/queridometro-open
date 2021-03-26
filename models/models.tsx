@@ -1,4 +1,11 @@
 /**
+ * Model que representa todos os votos de um dia.
+ */
+export interface VotesByDate {
+  [key: string]: User[]
+}
+
+/**
  * Model para representar um usuário cadastrado no sistema.
  */
 export interface User {

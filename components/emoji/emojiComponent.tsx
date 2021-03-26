@@ -1,4 +1,4 @@
-export default function Emoji(props) {
+export default function EmojiComponent(props) {
   const { user, emoji, form } = props;
 
   return (
@@ -6,9 +6,9 @@ export default function Emoji(props) {
       <label
         className={`transform flex justify-center
         ${
-          form.values[user.name] === emoji?.symbol
-            ? 'scale-110'
-            : 'blackAndWhite'
+          form?.values[user.name] === emoji?.symbol
+            ? 'blackAndWhite'
+            : 'scale-110'
         }`}
         key={emoji?.symbol + user?.name}
       >
@@ -16,12 +16,13 @@ export default function Emoji(props) {
           type="radio"
           name={user.name}
           value={emoji.symbol}
-          onChange={form.handleChange}
+          onChange={form?.handleChange}
         />
         <span className="cursor-pointer m-5 transition transform hover:text-shadow-xl hover:scale-125">
           {emoji.symbol}
         </span>
       </label>
+
       <style jsx>{`
         label.blackAndWhite {
           filter: grayscale(100%);
