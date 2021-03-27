@@ -1,6 +1,5 @@
 import Head from 'next/head';
-import React, { useCallback, useEffect, useState } from 'react';
-import SelectUser from '../components/selectUser/selectUser';
+import React from 'react';
 import {Button} from "../dummy-system";
 import Link from "next/link";
 

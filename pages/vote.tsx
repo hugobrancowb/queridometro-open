@@ -152,6 +152,8 @@ export default function Vote({ userList, emojisList }) {
                   {/* Lista de emojis/reações */}
                   {user.emojiList.map(emoji => (
                     <EmojiComponent
+                      pointer
+                      withShadow
                       key={user?.name + emoji?.label}
                       emoji={emoji}
                       user={user}

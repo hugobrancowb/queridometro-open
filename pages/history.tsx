@@ -1,7 +1,6 @@
 import * as FirebaseService from '../services/firebase-service';
 import React, { ChangeEvent, useState } from 'react';
 import Head from 'next/head';
-import { display } from '@material-ui/system';
 import EmojiComponent from '../components/emoji/emojiComponent';
 
 export default function History({ dates, votes }) {
@@ -80,13 +79,21 @@ export default function History({ dates, votes }) {
 
                 {/* Lista de emojis/reações */}
                 {person.emojiList.map(emoji => (
-                  <div className={`grid-rows-3 justify-center`}>
-                    <p className={`text-center text-sm text-gray-600 ${emoji.votes > 0 ? '' : 'text-opacity-20'}`}
-                       style={{position: 'relative', top: '14px'}}>
+                  <div
+                    className={`grid-rows-3 justify-center
+                    ${emoji?.votes > 0 ? 'text-gray-600' : 'text-gray-300'}
+                    hover:text-shadow-sm hover:text-gray-900
+                    `}
+                  >
+                    <p
+                      className={`text-center text-sm`}
+                      style={{ position: 'relative', top: '14px' }}
+                    >
                       {emoji?.votes}
                     </p>
                     <EmojiComponent
-                        className='row-span-2'
+                      allColor
+                      className="row-span-2"
                       key={person?.name + emoji?.label}
                       emoji={emoji}
                       user={person}
