@@ -2,9 +2,11 @@ import Head from 'next/head';
 import React from 'react';
 import {Button} from "../dummy-system";
 import Link from "next/link";
+import {useRouter} from "next/router";
 
 export default function Home() {
   const pageTitle = process.env.TITLE;
+  const router = useRouter();
   
   /**
    * PÁGINA.
@@ -23,8 +25,8 @@ export default function Home() {
       </div>
 
       <div className='container mx-auto w-full md:max-w-lg  grid grid-cols-2 gap-2'>
-        <Link href='/history'><Button primary >Ver histórico</Button></Link>
-        <Link href='/vote'><Button primary >Votar</Button></Link>
+        <Button primary onClick={() => {router.push('/history')}}>Ver histórico</Button>
+        <Button primary onClick={() => {router.push('/vote')}}>Votar</Button>
       </div>
     </>
   );

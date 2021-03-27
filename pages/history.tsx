@@ -4,14 +4,12 @@ import Head from 'next/head';
 import EmojiComponent from '../components/emoji/emojiComponent';
 
 export default function History({ dates, votes }) {
-  const [selectedDate, setSelectedDate] = useState<string>(null);
+  const [selectedDate, setSelectedDate] = useState<string>('-1');
 
   const pageTitle = `Histórico - ${process.env.TITLE}`;
 
   const handleDateSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
     const selectedDate = event.target.value;
-    console.log('votos do dia: ', votes[selectedDate]);
-    console.log('tamanho: ', votes[selectedDate]?.length);
     setSelectedDate(selectedDate);
   };
 
@@ -44,7 +42,7 @@ export default function History({ dates, votes }) {
             value={selectedDate}
             disabled={!(dates.length > 0)}
           >
-            <option disabled selected={true} value={null} key={-1}>
+            <option disabled value={'-1'} key={'-1'}>
               Selecione uma data
             </option>
             {dates.map((date, index) => (
@@ -56,18 +54,21 @@ export default function History({ dates, votes }) {
         </div>
       </div>
 
-      {selectedDate && (
+      {selectedDate && selectedDate !== '-1' && (
         <div className="container mx-auto px-6 md:px-0">
           <div
             className={`py-4 container w-full md:max-w-lg md:mx-auto flex flex-col
-            justify-center grid grid-rows-${votes[selectedDate].length}`}
+            justify-center grid grid-rows-${votes[selectedDate]?.length}`}
           >
             {votes[selectedDate].map(person => (
               <div
+                key={'div:' + person?.name}
                 className={`row justify-center grid text-2xl items-center py-2 gap-1 grid-cols-11`}
               >
                 {/* Foto do participante */}
-                <div className="col-span-2 flex justify-center">
+                <div
+                  className="col-span-2 flex justify-center"
+                >
                   <div
                     className="w-1/2 p-6 shadow rounded-full"
                     style={{
@@ -80,6 +81,7 @@ export default function History({ dates, votes }) {
                 {/* Lista de emojis/reações */}
                 {person.emojiList.map(emoji => (
                   <div
+                    key={person?.name + emoji?.label}
                     className={`grid-rows-3 justify-center
                     ${emoji?.votes > 0 ? 'text-gray-600' : 'text-gray-300'}
                     hover:text-shadow-sm hover:text-gray-900
@@ -94,7 +96,6 @@ export default function History({ dates, votes }) {
                     <EmojiComponent
                       allColor
                       className="row-span-2"
-                      key={person?.name + emoji?.label}
                       emoji={emoji}
                       user={person}
                     />
