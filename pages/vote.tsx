@@ -7,13 +7,17 @@ import { Emoji, User } from '../models/models';
 import { useFormik } from 'formik';
 import { Button } from '../dummy-system';
 import EmojiComponent from '../components/emoji/emojiComponent';
+import { useRouter } from 'next/router';
 
 export default function Vote({ userList, emojisList }) {
+  const pageTitle = `Votação - ${process.env.TITLE}`;
+  const router = useRouter();
   const passwordfield = {
     password: Yup.string().required('Palavra-chave é obrigratória'),
   };
 
   const [user, setUser] = useState<string | number>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedState, setSelectedState] = useState<boolean>(false);
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
   const [validationSchema, setValidationSchema] = useState<any>(
@@ -22,12 +26,18 @@ export default function Vote({ userList, emojisList }) {
     }),
   );
 
-  const pageTitle = 'Votação - Queridômetro Justa';
-
   const form = useFormik({
     initialValues: null,
     onSubmit: async values => {
-      FirebaseService.vote(values, userList);
+      if (values.password !== process.env.PASSPHRASE) {
+        form.setErrors({ password: 'Senha inválida.' });
+        return;
+      }
+      setLoading(true);
+      await FirebaseService.vote(values, userList)
+        .then(res => router.push('/'))
+        .catch()
+        .finally(() => setLoading(false));
     },
     validationSchema: validationSchema,
     validateOnChange: true,
@@ -168,6 +178,7 @@ export default function Vote({ userList, emojisList }) {
                   placeholder="Palavra-chave"
                   name="password"
                   type="password"
+                  autoComplete='none'
                   onChange={form.handleChange}
                   className={`col-span-5 rounded-md ${
                     form.errors?.password && form.touched?.password
@@ -175,9 +186,19 @@ export default function Vote({ userList, emojisList }) {
                       : ''
                   }`}
                 />
-                <Button primary type="submit" className="col-span-3">
+                <Button
+                  primary
+                  type="submit"
+                  className="col-span-3"
+                  loading={loading}
+                >
                   Enviar
                 </Button>
+                {form?.errors?.password && form?.touched?.password && (
+                  <p className="col-span-8 text-red-600 text-xs">
+                    {form?.errors?.password}
+                  </p>
+                )}
               </div>
             </form>
           )}

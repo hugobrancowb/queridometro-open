@@ -4,8 +4,7 @@ import {Button} from "../dummy-system";
 import Link from "next/link";
 
 export default function Home() {
-  
-  const pageTitle = 'Queridômetro Justa';
+  const pageTitle = process.env.TITLE;
   
   /**
    * PÁGINA.

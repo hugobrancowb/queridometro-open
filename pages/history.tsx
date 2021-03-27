@@ -6,7 +6,7 @@ import EmojiComponent from '../components/emoji/emojiComponent';
 export default function History({ dates, votes }) {
   const [selectedDate, setSelectedDate] = useState<string>(null);
 
-  const pageTitle = 'Histórico - Queridômetro Justa';
+  const pageTitle = `Histórico - ${process.env.TITLE}`;
 
   const handleDateSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
     const selectedDate = event.target.value;

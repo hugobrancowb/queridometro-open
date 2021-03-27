@@ -6,15 +6,17 @@ const ButtonStyled = styled.button`
 `;
 
 export default function Button({ ...props }) {
-  const { children, onClick, className } = props;
+  const { children, onClick, className, loading, primary, secondary } = props;
 
   return (
     <ButtonStyled
       className={`${className} rounded-md text-white py-2 px-5
-      ${props?.primary ? 'bg-blue-700' : ''}
-      ${props?.secondary ? 'bg-gray-300' : ''}
+      ${primary && !loading ? 'bg-blue-700' : ''}
+      ${secondary || loading ? 'bg-gray-300' : ''}
       ${props?.danger ? 'bg-red-700' : ''}
+      ${loading ? 'cursor-wait' : ''}
       `}
+      disabled={loading}
       onClick={onClick}
     >
       {children}
