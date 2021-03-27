@@ -190,7 +190,7 @@ export default function Vote({ userList, emojisList }) {
 /**
  * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
  */
-export async function getStaticProps() {
+export async function getServerSideProps() {
   let [userList, emojisList] = await Promise.all([
     FirebaseService.getUsers(),
     FirebaseService.getEmojis(),

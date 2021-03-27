@@ -112,7 +112,7 @@ export default function History({ dates, votes }) {
 /**
  * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
  */
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const votes = await FirebaseService.getAllVotes();
   const dates = Object.keys(votes);
 
