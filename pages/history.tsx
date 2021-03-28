@@ -2,6 +2,7 @@ import * as FirebaseService from '../services/firebase-service';
 import React, { ChangeEvent, useState } from 'react';
 import Head from 'next/head';
 import EmojiComponent from '../components/emoji/emojiComponent';
+import clsx from 'clsx';
 
 export default function History({ dates, votes }) {
   const [selectedDate, setSelectedDate] = useState<string>('-1');
@@ -57,8 +58,15 @@ export default function History({ dates, votes }) {
       {selectedDate && selectedDate !== '-1' && (
         <div className="container mx-auto px-6 md:px-0">
           <div
-            className={`py-4 container w-full md:max-w-lg md:mx-auto flex flex-col
-            justify-center grid grid-rows-${votes[selectedDate]?.length}`}
+            className={clsx(
+              `py-4 container w-full md:max-w-lg md:mx-auto flex flex-col
+              justify-center grid`,
+              {
+                [`grid-rows-${votes[selectedDate]?.length}`]: votes[
+                  selectedDate
+                ],
+              },
+            )}
           >
             {votes[selectedDate].map(person => (
               <div
@@ -66,9 +74,7 @@ export default function History({ dates, votes }) {
                 className={`row justify-center grid text-2xl items-center py-2 gap-1 grid-cols-11`}
               >
                 {/* Foto do participante */}
-                <div
-                  className="col-span-2 flex justify-center"
-                >
+                <div className="col-span-2 flex justify-center">
                   <div
                     className="w-1/2 p-6 shadow rounded-full"
                     style={{
@@ -82,10 +88,13 @@ export default function History({ dates, votes }) {
                 {person.emojiList.map(emoji => (
                   <div
                     key={person?.name + emoji?.label}
-                    className={`grid-rows-3 justify-center
-                    ${emoji?.votes > 0 ? 'text-gray-600' : 'text-gray-300'}
-                    hover:text-shadow-sm hover:text-gray-900
-                    `}
+                    className={clsx(`grid-rows-3 justify-center hover:text-shadow-sm
+                    hover:text-gray-900`, {
+                      'text-gray-600': emoji?.votes > 0,
+                      'text-gray-300': !(emoji?.votes > 0),
+                    })
+                    
+                    }
                   >
                     <p
                       className={`text-center text-sm`}

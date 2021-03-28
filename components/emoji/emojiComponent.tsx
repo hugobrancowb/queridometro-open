@@ -1,15 +1,15 @@
+import clsx from 'clsx';
+
 export default function EmojiComponent(props) {
   const { user, emoji, form } = props;
 
   return (
     <>
       <label
-        className={`transform flex justify-center
-        ${
-          form?.values[user.name] === emoji?.symbol || props?.allColor
-            ? ''
-            : 'blackAndWhite'
-        }`}
+        className={clsx('transform flex justify-center', {
+          blackAndWhite:
+            form?.values[user.name] !== emoji?.symbol && !props?.allColor,
+        })}
         key={emoji?.symbol + user?.name}
       >
         <input
@@ -19,9 +19,10 @@ export default function EmojiComponent(props) {
           onChange={form?.handleChange}
         />
         <span
-          className={`${
-            props?.pointer ? 'cursor-pointer hover:scale-125' : ''
-          } m-5 transition transform ${props?.withShadow && 'hover:text-shadow-lg'}`}
+          className={clsx('m-5 transition transform', {
+            'cursor-pointer hover:scale-125': props?.pointer,
+            'hover:text-shadow-lg': props?.withShadow,
+          })}
         >
           {emoji.symbol}
         </span>
