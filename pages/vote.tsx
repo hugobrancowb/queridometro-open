@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import { Button } from '../dummy-system';
 import EmojiComponent from '../components/emoji/emojiComponent';
 import { useRouter } from 'next/router';
+import clsx from 'clsx';
 
 export default function Vote({ userList, emojisList }) {
   const pageTitle = `Votação - ${process.env.TITLE}`;
@@ -137,22 +138,33 @@ export default function Vote({ userList, emojisList }) {
           {selectedState && (
             <form
               onSubmit={form.handleSubmit}
-              className={`py-4 container w-full md:max-w-lg md:mx-auto flex flex-col justify-center grid grid-rows-${filteredUserList.length}`}
+              className={clsx(
+                `py-4 container w-full md:max-w-lg md:mx-auto flex flex-col justify-center grid`,
+                { [`grid-rows-${filteredUserList.length}`]: filteredUserList },
+              )}
             >
               {filteredUserList.map(user => (
                 <div
-                  className={`row justify-center grid text-2xl items-center py-2 gap-1 grid-cols-11 border-l-4
-          ${
-            form?.errors[user.name] && form?.touched[user.name]
-              ? 'border-red-600'
-              : 'border-transparent'
-          }`}
+                  className={clsx(
+                    `row justify-center grid text-2xl items-center py-2 gap-1 border-l-4`,
+                    {
+                      'border-red-600':
+                        form?.errors[user.name] && form?.touched[user.name],
+                      'border-transparent':
+                        !form?.errors[user.name] || !form?.touched[user.name],
+                      [`grid-cols-${
+                        user.emojiList.length + 1
+                      }`]: user.emojiList,
+                    },
+                  )}
                   key={user.name}
                 >
                   {/* Foto do participante */}
-                  <div className="col-span-2 flex justify-center">
+                  <div className="flex justify-center">
                     <div
-                      className="w-1/2 p-6 shadow rounded-full"
+                      role="image"
+                      aria-label={`Foto de ${user.name}`}
+                      className="w-50 p-6 shadow rounded-full"
                       style={{
                         background: `url("${user?.photo}") no-repeat center center`,
                         backgroundSize: 'cover',
@@ -181,11 +193,10 @@ export default function Vote({ userList, emojisList }) {
                   type="password"
                   autoComplete="none"
                   onChange={form.handleChange}
-                  className={`col-span-5 rounded-md ${
-                    form.errors?.password && form.touched?.password
-                      ? 'border-red-600'
-                      : ''
-                  }`}
+                  className={clsx(`col-span-5 rounded-md`, {
+                    'border-red-600':
+                      form.errors?.password && form.touched?.password,
+                  })}
                 />
                 <Button
                   primary
