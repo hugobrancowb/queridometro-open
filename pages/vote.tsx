@@ -139,22 +139,18 @@ export default function Vote({ userList, emojisList }) {
             <form
               onSubmit={form.handleSubmit}
               className={clsx(
-                `py-4 container w-full md:max-w-lg md:mx-auto flex flex-col justify-center grid`,
-                { [`grid-rows-${filteredUserList.length}`]: filteredUserList },
+                `py-4 container w-full md:max-w-lg md:mx-auto flex flex-col justify-center grid grid-flow-row`,
               )}
             >
               {filteredUserList.map(user => (
                 <div
                   className={clsx(
-                    `row justify-center grid text-2xl items-center py-2 gap-1 border-l-4`,
+                    `row justify-center grid grid-flow-col text-2xl items-center py-2 gap-1 border-l-4`,
                     {
                       'border-red-600':
                         form?.errors[user.name] && form?.touched[user.name],
                       'border-transparent':
                         !form?.errors[user.name] || !form?.touched[user.name],
-                      [`grid-cols-${
-                        user.emojiList.length + 1
-                      }`]: user.emojiList,
                     },
                   )}
                   key={user.name}

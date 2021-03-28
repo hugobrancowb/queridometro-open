@@ -19,7 +19,7 @@ export default function EmojiComponent(props) {
           onChange={form?.handleChange}
         />
         <span
-          className={clsx('m-5 transition transform', {
+          className={clsx('m-2 md:m-5 transition transform', {
             'cursor-pointer hover:scale-125': props?.pointer,
             'hover:text-shadow-lg': props?.withShadow,
           })}

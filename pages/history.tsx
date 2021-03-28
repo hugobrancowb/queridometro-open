@@ -67,17 +67,14 @@ export default function History({ dates, votes }) {
         <div className="container mx-auto px-6 md:px-0">
           <div
             className={clsx(
-              `py-4 container w-full md:max-w-lg md:mx-auto flex flex-col
-              justify-center grid`,
-              {
-                [`grid-rows-${votesOnDate?.length}`]: votes[selectedDate],
-              },
+              `py-4 container w-full md:max-w-lg md:mx-auto
+              justify-center grid grid-flow-row`
             )}
           >
             {votesOnDate.map(person => (
               <div
                 key={'div:' + person?.name}
-                className={`row justify-center grid text-2xl items-center py-2 gap-1 grid-cols-11`}
+                className={`row justify-center text-2xl items-center py-2 gap-1 grid grid-flow-col`}
               >
                 {/* Foto do participante */}
                 <div className="col-span-2 flex justify-center">
@@ -95,8 +92,7 @@ export default function History({ dates, votes }) {
                   <div
                     key={person?.name + emoji?.label}
                     className={clsx(
-                      `grid-rows-3 justify-center hover:text-shadow-sm
-                    hover:text-gray-900`,
+                      `grid-rows-3 justify-center hover:text-shadow-sm hover:text-gray-900`,
                       {
                         'text-gray-600': emoji?.votes > 0,
                         'text-gray-300': !(emoji?.votes > 0),
@@ -104,8 +100,7 @@ export default function History({ dates, votes }) {
                     )}
                   >
                     <p
-                      className={`text-center text-sm`}
-                      style={{ position: 'relative', top: '14px' }}
+                      className={clsx(`text-center text-sm relative top-1 md:top-4`)}
                     >
                       {emoji?.votes}
                     </p>
