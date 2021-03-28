@@ -3,15 +3,23 @@ import React, { ChangeEvent, useState } from 'react';
 import Head from 'next/head';
 import EmojiComponent from '../components/emoji/emojiComponent';
 import clsx from 'clsx';
+import { sleep } from '../services/utils';
 
 export default function History({ dates, votes }) {
   const [selectedDate, setSelectedDate] = useState<string>('-1');
+  const [votesOnDate, setVotesOnDate] = useState<any>([]);
 
   const pageTitle = `Histórico - ${process.env.TITLE}`;
 
-  const handleDateSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
+  const handleDateSelect = async (
+    event: ChangeEvent<HTMLSelectElement>,
+  ): Promise<void> => {
     const selectedDate = event.target.value;
     setSelectedDate(selectedDate);
+
+    setVotesOnDate([]);
+    await sleep(50);
+    setVotesOnDate(votes[selectedDate]);
   };
 
   return (
@@ -62,13 +70,11 @@ export default function History({ dates, votes }) {
               `py-4 container w-full md:max-w-lg md:mx-auto flex flex-col
               justify-center grid`,
               {
-                [`grid-rows-${votes[selectedDate]?.length}`]: votes[
-                  selectedDate
-                ],
+                [`grid-rows-${votesOnDate?.length}`]: votes[selectedDate],
               },
             )}
           >
-            {votes[selectedDate].map(person => (
+            {votesOnDate.map(person => (
               <div
                 key={'div:' + person?.name}
                 className={`row justify-center grid text-2xl items-center py-2 gap-1 grid-cols-11`}
@@ -88,13 +94,14 @@ export default function History({ dates, votes }) {
                 {person.emojiList.map(emoji => (
                   <div
                     key={person?.name + emoji?.label}
-                    className={clsx(`grid-rows-3 justify-center hover:text-shadow-sm
-                    hover:text-gray-900`, {
-                      'text-gray-600': emoji?.votes > 0,
-                      'text-gray-300': !(emoji?.votes > 0),
-                    })
-                    
-                    }
+                    className={clsx(
+                      `grid-rows-3 justify-center hover:text-shadow-sm
+                    hover:text-gray-900`,
+                      {
+                        'text-gray-600': emoji?.votes > 0,
+                        'text-gray-300': !(emoji?.votes > 0),
+                      },
+                    )}
                   >
                     <p
                       className={`text-center text-sm`}

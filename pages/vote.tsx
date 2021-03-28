@@ -3,7 +3,7 @@ import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import * as FirebaseService from '../services/firebase-service';
 import * as Yup from 'yup';
 import SelectUser from '../components/selectUser/selectUser';
-import { Emoji, User } from '../models/models';
+import { Emoji, GenericObject, User } from '../models/models';
 import { useFormik } from 'formik';
 import { Button } from '../dummy-system';
 import EmojiComponent from '../components/emoji/emojiComponent';
@@ -73,10 +73,10 @@ export default function Vote({ userList, emojisList }) {
 
   /** Reconstroi o formulário cada vez que um usuário diferente é selecionado. */
   const buildForm = useCallback(
-    (filteredUserList: User[]) => {
+    (filteredUserList: User[], oldValues: GenericObject[]) => {
       const _initialValues = { password: form?.values?.password ?? null };
       filteredUserList.forEach(user => {
-        _initialValues[user.name] = null;
+        _initialValues[user.name] = oldValues[user.name] ?? null;
       });
 
       form.setValues(_initialValues);
@@ -104,9 +104,10 @@ export default function Vote({ userList, emojisList }) {
   useEffect(() => {
     if (user !== null) {
       const _users = userList.filter(u => u.name !== user);
+      const _oldValues = form.values;
       setFilteredUserList(buildNewVoteObject(_users, emojisList));
       setSelectedState(true);
-      buildForm(_users);
+      buildForm(_users, _oldValues);
       buildValidationSchema(_users);
     }
   }, [user]);
@@ -178,7 +179,7 @@ export default function Vote({ userList, emojisList }) {
                   placeholder="Palavra-chave"
                   name="password"
                   type="password"
-                  autoComplete='none'
+                  autoComplete="none"
                   onChange={form.handleChange}
                   className={`col-span-5 rounded-md ${
                     form.errors?.password && form.touched?.password
