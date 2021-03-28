@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Emoji, GenericObject, User, VotesByDate} from '../models/models';
+import { Emoji, GenericObject, User, VotesByDate } from '../models/models';
 import { dateNow } from './utils';
 
 /**
@@ -9,7 +9,7 @@ import { dateNow } from './utils';
  */
 export const getUsers = (): Promise<User[]> => {
   return axios
-    .get(`${process.env.FIREBASE_URL}/users.json`)
+    .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/users.json`)
     .then(res => res.data as User[]);
 };
 
@@ -20,7 +20,7 @@ export const getUsers = (): Promise<User[]> => {
  */
 export const getEmojis = (): Promise<Emoji[]> => {
   return axios
-    .get(`${process.env.FIREBASE_URL}/emojis.json`)
+    .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/emojis.json`)
     .then(res => res.data as Emoji[]);
 };
 
@@ -31,7 +31,7 @@ export const getEmojis = (): Promise<Emoji[]> => {
  */
 export const getVotesFromDate = async (date: string): Promise<User[]> => {
   let users: User[] = await axios
-    .get(`${process.env.FIREBASE_URL}/history/${date}.json`)
+    .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/history/${date}.json`)
     .then(res => res?.data);
 
   return users ?? [];
@@ -43,7 +43,7 @@ export const getVotesFromDate = async (date: string): Promise<User[]> => {
  */
 export const getAllVotes = async (): Promise<VotesByDate[]> => {
   let votes: VotesByDate[] = await axios
-    .get(`${process.env.FIREBASE_URL}/history.json`)
+    .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/history.json`)
     .then(res => res?.data);
 
   return votes ?? [];
@@ -65,7 +65,7 @@ export const vote = async (
   });
 
   return axios.put(
-    `${process.env.FIREBASE_URL}/history/${date}.json`,
+    `${process.env.NEXT_PUBLIC_FIREBASE_URL}/history/${date}.json`,
     votosGerados,
   );
 };

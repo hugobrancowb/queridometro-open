@@ -1,11 +1,9 @@
 import Head from 'next/head';
 import React, { useState } from 'react';
 import { Button } from '../dummy-system';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import * as FirebaseService from "../services/firebase-service";
-export default function Home({title}) {
-  const pageTitle = title;
+export default function Home() {
+  const pageTitle = process.env.NEXT_PUBLIC_TITLE;
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -29,7 +27,11 @@ export default function Home({title}) {
       </div>
 
       <div className="container mx-auto w-full md:max-w-lg  grid grid-cols-2 gap-2">
-        <Button primary loading={loading} onClick={() => redirectTo('/history')}>
+        <Button
+          primary
+          loading={loading}
+          onClick={() => redirectTo('/history')}
+        >
           Ver histórico
         </Button>
         <Button primary loading={loading} onClick={() => redirectTo('/vote')}>
@@ -38,12 +40,4 @@ export default function Home({title}) {
       </div>
     </>
   );
-}
-
-export async function getServerSideProps() {
-  const title = process.env.TITLE;
-  
-  return {
-    props: { title },
-  };
 }

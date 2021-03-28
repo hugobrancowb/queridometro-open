@@ -10,9 +10,8 @@ import EmojiComponent from '../components/emoji/emojiComponent';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
 
-export default function Vote({ PASSPHRASE, title, userList, emojisList }) {
-  const pageTitle = `Votação - ${title}`;
-  const passphrase = PASSPHRASE;
+export default function Vote({ userList, emojisList }) {
+  const pageTitle = `Votação - ${process.env.NEXT_PUBLIC_TITLE}`;
   const router = useRouter();
   const passwordfield = {
     password: Yup.string().required('Palavra-chave é obrigratória'),
@@ -31,7 +30,7 @@ export default function Vote({ PASSPHRASE, title, userList, emojisList }) {
   const form = useFormik({
     initialValues: null,
     onSubmit: async values => {
-      if (values.password !== passphrase) {
+      if (values.password !== process.env.NEXT_PUBLIC_PASSPHRASE) {
         form.setErrors({ password: 'Senha inválida.' });
         return;
       }
@@ -221,8 +220,7 @@ export default function Vote({ PASSPHRASE, title, userList, emojisList }) {
  * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
  */
 export async function getServerSideProps() {
-  const title = process.env.TITLE;
-  const PASSPHRASE = process.env.PASSPHRASE;
+  const title = process.env.NEXT_PUBLIC_TITLE;
   let [userList, emojisList] = await Promise.all([
     FirebaseService.getUsers(),
     FirebaseService.getEmojis(),
@@ -236,7 +234,6 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      PASSPHRASE,
       title,
       userList,
       emojisList,

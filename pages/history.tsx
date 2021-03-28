@@ -5,11 +5,11 @@ import EmojiComponent from '../components/emoji/emojiComponent';
 import clsx from 'clsx';
 import { sleep } from '../services/utils';
 
-export default function History({ title, dates, votes }) {
+export default function History({ dates, votes }) {
   const [selectedDate, setSelectedDate] = useState<string>('-1');
   const [votesOnDate, setVotesOnDate] = useState<any>([]);
 
-  const pageTitle = `Histórico - ${title}`;
+  const pageTitle = `Histórico - ${process.env.NEXT_PUBLIC_TITLE}`;
 
   const handleDateSelect = async (
     event: ChangeEvent<HTMLSelectElement>,
@@ -68,7 +68,7 @@ export default function History({ title, dates, votes }) {
           <div
             className={clsx(
               `py-4 container w-full md:max-w-lg md:mx-auto
-              justify-center grid grid-flow-row`
+              justify-center grid grid-flow-row`,
             )}
           >
             {votesOnDate.map(person => (
@@ -100,7 +100,9 @@ export default function History({ title, dates, votes }) {
                     )}
                   >
                     <p
-                      className={clsx(`text-center text-sm relative top-1 md:top-4`)}
+                      className={clsx(
+                        `text-center text-sm relative top-1 md:top-4`,
+                      )}
                     >
                       {emoji?.votes}
                     </p>
@@ -125,11 +127,10 @@ export default function History({ title, dates, votes }) {
  * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
  */
 export async function getServerSideProps() {
-  const title = process.env.TITLE;
   const votes = await FirebaseService.getAllVotes();
   const dates = Object.keys(votes);
 
   return {
-    props: { title, dates, votes },
+    props: { dates, votes },
   };
 }
