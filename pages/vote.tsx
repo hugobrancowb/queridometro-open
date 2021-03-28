@@ -10,8 +10,9 @@ import EmojiComponent from '../components/emoji/emojiComponent';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
 
-export default function Vote({ passphrase, title, userList, emojisList }) {
+export default function Vote({ PASSPHRASE, title, userList, emojisList }) {
   const pageTitle = `Votação - ${title}`;
+  const passphrase = PASSPHRASE;
   const router = useRouter();
   const passwordfield = {
     password: Yup.string().required('Palavra-chave é obrigratória'),
@@ -221,7 +222,7 @@ export default function Vote({ passphrase, title, userList, emojisList }) {
  */
 export async function getServerSideProps() {
   const title = process.env.TITLE;
-  const passphrase = process.env.PASSPHRASE;
+  const PASSPHRASE = process.env.PASSPHRASE;
   let [userList, emojisList] = await Promise.all([
     FirebaseService.getUsers(),
     FirebaseService.getEmojis(),
@@ -235,7 +236,7 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      passphrase,
+      PASSPHRASE,
       title,
       userList,
       emojisList,
