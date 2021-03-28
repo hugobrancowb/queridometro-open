@@ -107,7 +107,7 @@ export default function Vote({ userList, emojisList }) {
       const _oldValues = form.values;
       setFilteredUserList(buildNewVoteObject(_users, emojisList));
       setSelectedState(true);
-      buildForm(_users, _oldValues);
+      buildForm(_users, _oldValues ?? []);
       buildValidationSchema(_users);
     }
   }, [user]);
