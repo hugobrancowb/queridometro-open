@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { Button } from '../dummy-system';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-
-export default function Home() {
-  const pageTitle = process.env.TITLE;
+import * as FirebaseService from "../services/firebase-service";
+export default function Home({title}) {
+  const pageTitle = title;
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,4 +38,12 @@ export default function Home() {
       </div>
     </>
   );
+}
+
+export async function getServerSideProps() {
+  const title = process.env.TITLE;
+  
+  return {
+    props: { title },
+  };
 }

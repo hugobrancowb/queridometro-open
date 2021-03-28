@@ -5,11 +5,11 @@ import EmojiComponent from '../components/emoji/emojiComponent';
 import clsx from 'clsx';
 import { sleep } from '../services/utils';
 
-export default function History({ dates, votes }) {
+export default function History({ title, dates, votes }) {
   const [selectedDate, setSelectedDate] = useState<string>('-1');
   const [votesOnDate, setVotesOnDate] = useState<any>([]);
 
-  const pageTitle = `Histórico - ${process.env.TITLE}`;
+  const pageTitle = `Histórico - ${title}`;
 
   const handleDateSelect = async (
     event: ChangeEvent<HTMLSelectElement>,
@@ -125,10 +125,11 @@ export default function History({ dates, votes }) {
  * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
  */
 export async function getServerSideProps() {
+  const title = process.env.TITLE;
   const votes = await FirebaseService.getAllVotes();
   const dates = Object.keys(votes);
 
   return {
-    props: { dates, votes },
+    props: { title, dates, votes },
   };
 }
