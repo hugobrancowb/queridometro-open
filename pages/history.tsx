@@ -107,7 +107,7 @@ export default function History({ dates, votes }) {
                       {emoji?.votes}
                     </p>
                     <EmojiComponent
-                      allColor
+                      colorful={emoji?.votes > 0}
                       className="row-span-2"
                       emoji={emoji}
                       user={person}

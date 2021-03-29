@@ -8,7 +8,7 @@ export default function EmojiComponent(props) {
       <label
         className={clsx('transform flex justify-center', {
           blackAndWhite:
-            form?.values[user.name] !== emoji?.symbol && !props?.allColor,
+            form?.values[user.name] !== emoji?.symbol && !props?.colorful,
         })}
         key={emoji?.symbol + user?.name}
       >
