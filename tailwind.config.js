@@ -1,10 +1,13 @@
 module.exports = {
-  purge: [
-    './components/**/*.{js,ts,jsx,tsx}',
-    './dummy-system/**/*.{js,ts,jsx,tsx}',
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './styles/**/*.{js,ts,jsx,tsx}',
-  ],
+  purge: {
+    enabled: process.env.NODE_ENV === 'production',
+    content: [
+      './components/**/*.{js,ts,jsx,tsx}',
+      './dummy-system/**/*.{js,ts,jsx,tsx}',
+      './pages/**/*.{js,ts,jsx,tsx}',
+      './styles/**/*.{js,ts,jsx,tsx}',
+    ],
+  },
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {},
