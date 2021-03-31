@@ -1,32 +1,46 @@
 import Head from 'next/head';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import * as FirebaseService from '../services/firebase-service';
+import * as FirebaseService from '../../services/firebase-service';
 import * as Yup from 'yup';
-import SelectUser from '../components/selectUser/selectUser';
-import { Emoji, GenericObject, User } from '../models/models';
+import SelectUser from '../../components/selectUser/selectUser';
+import { Emoji, GenericObject, User } from '../../models/models';
 import { useFormik } from 'formik';
-import { Button } from '../dummy-system';
-import EmojiComponent from '../components/emoji/emojiComponent';
+import { Button } from '../../dummy-system';
+import EmojiComponent from '../../components/emoji/emojiComponent';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
 
-export default function Vote({ userList, emojisList }) {
-  const pageTitle = `Votação - ${process.env.NEXT_PUBLIC_TITLE}`;
+export default function Vote(props) {
   const router = useRouter();
+  const { paramUser } = router.query;
+
+  const userList: User[] = props.userList;
+  const emojisList: Emoji[] = props.emojisList;
+
+  const pageTitle = `Votação - ${process.env.NEXT_PUBLIC_TITLE}`;
+
   const passwordfield = {
     password: Yup.string().required('Palavra-chave é obrigratória'),
   };
 
-  const [user, setUser] = useState<string | number>(null);
+  /** Loading state antes de uma mudança de página. */
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedState, setSelectedState] = useState<boolean>(false);
+  /** Usuário selecionado. */
+  const [user, setUser] = useState<string | number>(null);
+  /** Algum usuário está selecionado? */
+  const [isSelected, setIsSelected] = useState<boolean>(false);
+  /** Lista de usuários SEM o usuário selecionado. */
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
+  /** Validação de formulário. */
   const [validationSchema, setValidationSchema] = useState<any>(
     Yup.object().shape({
       ...passwordfield,
     }),
   );
 
+  /**
+   * Formulário de votação.
+   */
   const form = useFormik({
     initialValues: null,
     onSubmit: async values => {
@@ -72,7 +86,12 @@ export default function Vote({ userList, emojisList }) {
     return [];
   };
 
-  /** Reconstroi o formulário cada vez que um usuário diferente é selecionado. */
+  /**
+   * Reconstroi o formulário cada vez que um usuário diferente é selecionado.
+   *
+   * @param filteredUserList Lista filtrada de usuários.
+   * @param oldValues Votos realizados antes da mudança de user.
+   */
   const buildForm = useCallback(
     (filteredUserList: User[], oldValues: GenericObject[]) => {
       const _initialValues = { password: form?.values?.password ?? null };
@@ -85,6 +104,11 @@ export default function Vote({ userList, emojisList }) {
     [filteredUserList],
   );
 
+  /**
+   * Reconstroi o esquema de validação do formulário de votos.
+   *
+   * @param filteredUserList Lista filtrada de usuários.
+   */
   const buildValidationSchema = useCallback(
     (filteredUserList: User[]) => {
       const _validationSchema = {
@@ -102,21 +126,35 @@ export default function Vote({ userList, emojisList }) {
     [filteredUserList],
   );
 
+  /**
+   * [Effect]: Alterações no parâmetro User.
+   */
+  useEffect(() => {
+    if (!paramUser) return;
+    
+    // temos um parâmetro
+    const _selectThisUser = userList.find(user => user.name === paramUser[0]);
+    if (_selectThisUser) {
+      setUser(_selectThisUser?.name);
+    } else {
+      // usuário não encontrado: limpa a rota com shallow routing
+      router.push('/vote', '/vote', { shallow: true });
+    }
+  }, [paramUser]);
+
+  /**
+   * [Effect]: user.
+   */
   useEffect(() => {
     if (user !== null) {
       const _users = userList.filter(u => u.name !== user);
       const _oldValues = form.values;
       setFilteredUserList(buildNewVoteObject(_users, emojisList));
-      setSelectedState(true);
+      setIsSelected(true);
       buildForm(_users, _oldValues ?? []);
       buildValidationSchema(_users);
     }
   }, [user]);
-
-  const voteProps = {
-    form,
-    filteredUserList,
-  };
 
   return (
     <>
@@ -135,7 +173,7 @@ export default function Vote({ userList, emojisList }) {
         <div className="row justify-center">
           {SelectUser(user, userList, handleUserSelect)}
 
-          {selectedState && (
+          {isSelected && (
             <form
               onSubmit={form.handleSubmit}
               className={clsx(
