@@ -1,6 +1,5 @@
 import React, { ChangeEventHandler } from 'react';
 import { User } from '../../models/models';
-import clsx from "clsx";
 
 export default function SelectUser(
   user: string | number,

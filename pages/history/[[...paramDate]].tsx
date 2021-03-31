@@ -1,26 +1,68 @@
-import * as FirebaseService from '../services/firebase-service';
-import React, { ChangeEvent, useState } from 'react';
+import * as FirebaseService from '../../services/firebase-service';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Head from 'next/head';
-import EmojiComponent from '../components/emoji/emojiComponent';
+import EmojiComponent from '../../components/emoji/emojiComponent';
 import clsx from 'clsx';
-import { sleep } from '../services/utils';
+import { useRouter } from 'next/router';
 
 export default function History({ dates, votes }) {
+  const router = useRouter();
+  const { paramDate } = router.query;
+
   const [selectedDate, setSelectedDate] = useState<string>('-1');
   const [votesOnDate, setVotesOnDate] = useState<any>([]);
 
   const pageTitle = `Histórico - ${process.env.NEXT_PUBLIC_TITLE}`;
 
+  /**
+   * Função responsável pelo efeito de "pisca" quando o conteúdo é alterado.
+   */
   const handleDateSelect = async (
     event: ChangeEvent<HTMLSelectElement>,
   ): Promise<void> => {
-    const selectedDate = event.target.value;
-    setSelectedDate(selectedDate);
-
-    setVotesOnDate([]);
-    await sleep(50);
-    setVotesOnDate(votes[selectedDate]);
+    const _selectedDate = event.target.value;
+    setSelectedDate(_selectedDate);
   };
+
+  /**
+   * Formata data recebida via parâmetro.
+   * @returns string Data no formato dd-MM-yyyy.
+   */
+  const formatParamDate = (): string => {
+    if (paramDate?.length === 1) {
+      return paramDate[0];
+    }
+
+    if (paramDate?.length === 3) {
+      return (paramDate as string[]).reduce(
+        (formatedDate, el) => formatedDate + '-' + el,
+      );
+    }
+
+    // Não foi recebido argumento algum ou os parâmetros foram inválidos.
+    return null;
+  };
+
+  /**
+   * [Effect]: Alterações no parâmetro Date
+   */
+  useEffect(() => {
+    if (!paramDate) return;
+
+    // Data formatada
+    const _selectedDate: string = formatParamDate();
+    const _isValidDate: boolean = !!Object.keys(votes).find(
+      date => date === _selectedDate,
+    );
+
+    if (_selectedDate && _isValidDate) {
+      setSelectedDate(_selectedDate);
+      setVotesOnDate(votes[_selectedDate]);
+    } else {
+      // data inválida: limpa a rota com shallow routing
+      router.push('/history', '/history', { shallow: true });
+    }
+  }, [paramDate]);
 
   return (
     <>
