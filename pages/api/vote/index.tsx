@@ -17,9 +17,22 @@ export default async (
   return res;
 };
 
-export const postVote = async (req: NextApiRequest, res: NextApiResponse): Promise<NextApiResponse> => {
+export const postVote = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<NextApiResponse> => {
   const userList: User[] = req.body?.userList;
   const valuesFromForm: GenericObject = req.body?.valuesFromForm;
+  
+  // Confere senha
+  if (valuesFromForm.password !== process.env.PASSPHRASE) {
+    res.status(401).send({
+      ok: false,
+      message: 'Senha inválida',
+      error: { password: 'Senha inválida' },
+    });
+    return res;
+  }
 
   const date = dateNow();
   let votesFromToday: User[] = await axios
@@ -27,8 +40,7 @@ export const postVote = async (req: NextApiRequest, res: NextApiResponse): Promi
     .then(res => res?.data);
 
   votesFromToday = votesFromToday?.length !== 0 ? votesFromToday : userList;
-  
-  
+
   const votosGerados: User[] = votesFromToday.map(user => {
     user.emojiList
       .filter(emoji => emoji.symbol === valuesFromForm[user.name])
