@@ -45,18 +45,25 @@ export default function Vote(props) {
   const form = useFormik({
     initialValues: null,
     onSubmit: async valuesFromForm => {
-      if (valuesFromForm.password !== process.env.NEXT_PUBLIC_PASSPHRASE) {
-        form.setErrors({ password: 'Senha inválida.' });
-        return;
-      }
       setLoading(true);
 
       await axios
-        .post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/vote`, { valuesFromForm, userList })
-        .then(res => {
-          router.push('/')
+        .post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/vote`, {
+          valuesFromForm,
+          userList,
         })
-        .catch(()=> router.push('/'))
+        .then(res => {
+          console.log('res: ', res);
+          router.push('/');
+        })
+        .catch(err => {
+          const { error } = err?.response?.data;
+          if (error) {
+            Object.keys(error)
+              .filter(field => form.values[field] != undefined)
+              .forEach(field => (form.errors[field] = error[field]));
+          }
+        })
         .finally(() => setLoading(false));
     },
     validationSchema: validationSchema,
