@@ -9,6 +9,7 @@ import { Button } from '../../dummy-system';
 import EmojiComponent from '../../components/emoji/emojiComponent';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
+import axios from 'axios';
 
 export default function Vote(props) {
   const router = useRouter();
@@ -43,15 +44,19 @@ export default function Vote(props) {
    */
   const form = useFormik({
     initialValues: null,
-    onSubmit: async values => {
-      if (values.password !== process.env.NEXT_PUBLIC_PASSPHRASE) {
+    onSubmit: async valuesFromForm => {
+      if (valuesFromForm.password !== process.env.NEXT_PUBLIC_PASSPHRASE) {
         form.setErrors({ password: 'Senha inválida.' });
         return;
       }
       setLoading(true);
-      await FirebaseService.vote(values, userList)
-        .then(res => router.push('/'))
-        .catch()
+
+      await axios
+        .post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/vote`, { valuesFromForm, userList })
+        .then(res => {
+          router.push('/')
+        })
+        .catch(()=> router.push('/'))
         .finally(() => setLoading(false));
     },
     validationSchema: validationSchema,
@@ -131,7 +136,7 @@ export default function Vote(props) {
    */
   useEffect(() => {
     if (!paramUser) return;
-    
+
     // temos um parâmetro
     const _selectThisUser = userList.find(user => user.name === paramUser[0]);
     if (_selectThisUser) {
