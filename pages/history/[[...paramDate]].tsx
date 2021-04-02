@@ -22,6 +22,7 @@ export default function History({ dates, votes }) {
   ): Promise<void> => {
     const _selectedDate = event.target.value;
     setSelectedDate(_selectedDate);
+    setVotesOnDate(votes[_selectedDate])
   };
 
   /**

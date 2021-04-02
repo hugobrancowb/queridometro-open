@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { Emoji, GenericObject, User, VotesByDate } from '../models/models';
-import { dateNow } from './utils';
+import { Emoji, User, VotesByDate } from '../models/models';
 
 /**
  * Retorna lista de usuários cadastrados no sistema.
@@ -47,25 +46,4 @@ export const getAllVotes = async (): Promise<VotesByDate[]> => {
     .then(res => res?.data);
 
   return votes ?? [];
-};
-
-export const vote = async (
-  valuesFromForm: GenericObject,
-  userList: User[],
-): Promise<any> => {
-  const date = dateNow();
-  let usersToday: User[] = await getVotesFromDate(date);
-  usersToday = usersToday?.length !== 0 ? usersToday : userList;
-
-  const votosGerados: User[] = usersToday.map(user => {
-    user.emojiList
-      .filter(emoji => emoji.symbol === valuesFromForm[user.name])
-      .forEach(emoji => (emoji.votes += 1));
-    return user;
-  });
-
-  return axios.put(
-    `${process.env.NEXT_PUBLIC_FIREBASE_URL}/history/${date}.json`,
-    votosGerados,
-  );
 };
