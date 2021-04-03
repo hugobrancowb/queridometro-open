@@ -26,9 +26,9 @@ export default function Home() {
         </h1>
       </div>
 
-      <div className="container mx-auto w-full md:max-w-lg  grid grid-cols-2 gap-2">
+      <div className="container mx-auto w-full md:max-w-lg grid grid-cols-2 gap-2">
         <Button
-          primary
+          secondary
           loading={loading}
           onClick={() => redirectTo('/history')}
         >
