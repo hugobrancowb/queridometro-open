@@ -56,7 +56,7 @@ export const postVote = async (
 
   return axios
     .put(
-      `${process.env.NEXT_PUBLIC_FIREBASE_URL}/history/${date}.json`,
+      `${process.env.FIREBASE_URL}/history/${date}.json`,
       votosGerados,
     )
     .then(() => {

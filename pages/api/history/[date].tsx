@@ -32,7 +32,7 @@ export const getHistoryByDate = async (
     res.status(400).end(`Formato inválido`);
   } else {
     const body = await axios
-      .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/history/${date}.json`)
+      .get(`${process.env.FIREBASE_URL}/history/${date}.json`)
       .then(_res => _res?.data ?? []);
 
     res.status(200).json(body);

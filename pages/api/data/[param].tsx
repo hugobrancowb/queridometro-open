@@ -44,7 +44,7 @@ const getUsers = async (
   res: NextApiResponse,
 ): Promise<NextApiResponse> => {
   return axios
-    .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/users.json`)
+    .get(`${process.env.FIREBASE_URL}/users.json`)
     .then(response => {
       res.status(200).json(response.data);
       return res;
@@ -66,7 +66,7 @@ const getEmojis = async (
   res: NextApiResponse,
 ): Promise<NextApiResponse> => {
   return axios
-    .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/emojis.json`)
+    .get(`${process.env.FIREBASE_URL}/emojis.json`)
     .then(response => {
       res.status(200).json(response.data);
       return res;
