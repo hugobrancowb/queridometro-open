@@ -4,7 +4,7 @@ import EmojiComponent from '../../components/emoji/emojiComponent';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import {orderDates} from "../../utils";
+import { orderDates } from '../../utils';
 
 export default function History({ dates, votes }) {
   const router = useRouter();
@@ -121,7 +121,7 @@ export default function History({ dates, votes }) {
             {votesOnDate.map(person => (
               <div
                 key={'div:' + person?.name}
-                className={`row justify-center text-2xl items-center py-2 gap-1 grid grid-flow-col`}
+                className={`row justify-start text-2xl items-center py-2 gap-1 grid grid-flow-col`}
               >
                 {/* Foto do participante */}
                 <div className="col-span-2 flex justify-center">
@@ -135,32 +135,35 @@ export default function History({ dates, votes }) {
                 </div>
 
                 {/* Lista de emojis/reações */}
-                {person.emojiList.map(emoji => (
-                  <div
-                    key={person?.name + emoji?.label}
-                    className={clsx(
-                      `grid-rows-3 justify-center hover:text-shadow-sm hover:text-gray-900`,
-                      {
-                        'text-gray-600': emoji?.votes > 0,
-                        'text-gray-300': !(emoji?.votes > 0),
-                      },
-                    )}
-                  >
-                    <p
-                      className={clsx(
-                        `text-center text-sm relative top-1 md:top-4`,
-                      )}
-                    >
-                      {emoji?.votes}
-                    </p>
-                    <EmojiComponent
-                      colorful={emoji?.votes > 0}
-                      className="row-span-2"
-                      emoji={emoji}
-                      user={person}
-                    />
-                  </div>
-                ))}
+                {person.emojiList.map(
+                  emoji =>
+                    emoji?.votes > 0 && (
+                      <div
+                        key={person?.name + emoji?.label}
+                        className={clsx(
+                          `grid-rows-3 justify-center hover:text-shadow-sm hover:text-gray-900`,
+                          {
+                            'text-gray-600': emoji?.votes > 0,
+                            'text-gray-300': !(emoji?.votes > 0),
+                          },
+                        )}
+                      >
+                        <p
+                          className={clsx(
+                            `text-center text-sm relative top-1 md:top-4`,
+                          )}
+                        >
+                          {emoji?.votes}
+                        </p>
+                        <EmojiComponent
+                          colorful
+                          className="row-span-2"
+                          emoji={emoji}
+                          user={person}
+                        />
+                      </div>
+                    ),
+                )}
               </div>
             ))}
           </div>
