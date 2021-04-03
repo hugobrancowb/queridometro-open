@@ -2,9 +2,9 @@ import Head from 'next/head';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import SelectUser from '../../components/selectUser/selectUser';
-import { Emoji, GenericObject, User } from '../../models/models';
+import { Emoji, GenericObject, User } from '@models';
 import { useFormik } from 'formik';
-import { Button } from '../../dummy-system';
+import { Button } from '@dummy-system';
 import EmojiComponent from '../../components/emoji/emojiComponent';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
@@ -20,21 +20,23 @@ export default function Vote(props) {
   const pageTitle = `Votação - ${process.env.NEXT_PUBLIC_TITLE}`;
 
   const passwordfield = {
-    password: Yup.string().required('Palavra-chave é obrigratória'),
+    password: Yup.string()
+      .typeError('Palavra-chave é obrigatória.')
+      .required('Palavra-chave é obrigatória.'),
   };
 
   /** Loading state antes de uma mudança de página. */
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   /** Usuário selecionado. */
   const [user, setUser] = useState<string | number>(null);
-  
+
   /** Algum usuário está selecionado? */
   const [isSelected, setIsSelected] = useState<boolean>(false);
-  
+
   /** Lista de usuários SEM o usuário selecionado. */
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
-  
+
   /** Validação de formulário. */
   const [validationSchema, setValidationSchema] = useState<any>(
     Yup.object().shape({

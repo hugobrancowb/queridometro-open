@@ -1,5 +1,5 @@
 import React, { ChangeEventHandler } from 'react';
-import { User } from '../../models/models';
+import { User } from '@models';
 
 export default function SelectUser(
   user: string | number,

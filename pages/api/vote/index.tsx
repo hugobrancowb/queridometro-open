@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { GenericObject, User } from '../../../models/models';
+import { GenericObject, User } from '@models';
 import axios from 'axios';
-import { dateNow } from '../../../utils';
+import { dateNow } from '@utils';
 
 export default async (
   req: NextApiRequest,

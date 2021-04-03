@@ -1,16 +1,8 @@
-import React, {MouseEvent} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 
 export default function Button({ ...props }) {
   const { children, onClick, className, loading, primary, secondary, danger } = props;
-  
-  /**
-   * Método executado a cada clique no botão.
-   * @param e Evento de clique.
-   */
-  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    onClick(e);
-  }
   
   return (
     <button
@@ -23,7 +15,7 @@ export default function Button({ ...props }) {
         'text-gray-400': loading
       })}
       disabled={loading}
-      onClick={handleClick}
+      onClick={onClick}
     >
       {children}
     </button>
