@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { isValidDate } from '../../../utils';
+import { isValidDate } from '@utils';
 import axios from 'axios';
 
 export default async (

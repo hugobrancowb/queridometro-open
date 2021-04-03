@@ -4,7 +4,8 @@ import EmojiComponent from '../../components/emoji/emojiComponent';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { orderDates } from '../../utils';
+import { orderDates } from '@utils';
+import { UserPlaceholder } from '@dummy-system';
 
 export default function History({ dates, votes }) {
   const router = useRouter();
@@ -20,13 +21,23 @@ export default function History({ dates, votes }) {
    */
   const handleDateSelect = async (
     event: ChangeEvent<HTMLSelectElement>,
-  ): Promise<void> => {
-    const _selectedDate = event.target.value;
-    setSelectedDate(_selectedDate);
-    setVotesOnDate(votes[_selectedDate]);
+  ): Promise<void> => updateVotes(event?.target?.value);
 
-    // altera a rota com shallow routing
-    router.push(`/history`, `/history/${_selectedDate}`, { shallow: true });
+  /**
+   * Atualiza dados de votos de acordo com a data selecionada.
+   *
+   * @param date Data escolhida para exibição dos dados.
+   */
+  const updateVotes = async (date: string) => {
+    setVotesOnDate(null);
+    setSelectedDate(date);
+    router.push(`/history`, `/history/${date}`, { shallow: true }).then();
+
+    const votesFromDate = await axios
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/history/${date}`)
+      .then(res => res?.data);
+
+    setVotesOnDate(votesFromDate);
   };
 
   /**
@@ -34,22 +45,19 @@ export default function History({ dates, votes }) {
    * @returns string Data no formato dd-MM-yyyy.
    */
   const formatParamDate = (): string => {
-    if (paramDate?.length === 1) {
-      return paramDate[0];
-    }
+    if (paramDate?.length === 1) return paramDate[0];
 
-    if (paramDate?.length === 3) {
+    if (paramDate?.length === 3)
       return (paramDate as string[]).reduce(
-        (formatedDate, el) => formatedDate + '-' + el,
+        (formattedDate, el) => formattedDate + '-' + el,
       );
-    }
 
     // Não foi recebido argumento algum ou os parâmetros foram inválidos.
     return null;
   };
 
   /**
-   * [Effect]: Alterações no parâmetro Date
+   * [Effect]: Run on init
    */
   useEffect(() => {
     if (!paramDate) return;
@@ -60,14 +68,15 @@ export default function History({ dates, votes }) {
       date => date === _selectedDate,
     );
 
-    if (_selectedDate && _isValidDate) {
-      setSelectedDate(_selectedDate);
-      setVotesOnDate(votes[_selectedDate]);
-    } else {
-      // data inválida: limpa a rota com shallow routing
-      router.push('/history', '/history', { shallow: true });
-    }
-  }, [paramDate]);
+    if (_selectedDate && _isValidDate) updateVotes(_selectedDate);
+    else router.push('/history', '/history', { shallow: true });
+  }, []);
+
+  function fillWithUserPlaceholder(size: number) {
+    let output = [];
+    for (let i = 0; i < size; i++) output.push(<UserPlaceholder key={i} />);
+    return output;
+  }
 
   return (
     <>
@@ -75,13 +84,11 @@ export default function History({ dates, votes }) {
         <title>{pageTitle}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <div className="container mx-auto p-8">
         <h1 className="text-5xl font-sans text-center font-semibold">
           {pageTitle}
         </h1>
       </div>
-
       <div className="container mx-auto px-6 md:px-0">
         <div className="w-full md:max-w-xs md:mx-auto grid grid-rows-2">
           <label
@@ -109,16 +116,21 @@ export default function History({ dates, votes }) {
           </select>
         </div>
       </div>
-
-      {selectedDate && selectedDate !== '-1' && (
-        <div className="container mx-auto px-6 md:px-0">
-          <div
-            className={clsx(
-              `py-4 container w-full md:max-w-lg md:mx-auto
+      <div className="container mx-auto px-6 md:px-0">
+        <div
+          className={clsx(
+            `py-4 container w-full md:max-w-lg md:mx-auto
               justify-center grid grid-flow-row`,
-            )}
-          >
-            {votesOnDate.map(person => (
+          )}
+        >
+          {/* Placeholder de carregamento */}
+          {(!votesOnDate || votesOnDate?.length === 0) &&
+            selectedDate !== '-1' &&
+            fillWithUserPlaceholder(6)}
+
+          {votesOnDate &&
+            votesOnDate?.length > 0 &&
+            votesOnDate.map(person => (
               <div
                 key={'div:' + person?.name}
                 className={`row justify-start text-2xl items-center py-2 gap-1 grid grid-flow-col`}
@@ -166,9 +178,9 @@ export default function History({ dates, votes }) {
                 )}
               </div>
             ))}
-          </div>
         </div>
-      )}
+      </div>
+      )
     </>
   );
 }
