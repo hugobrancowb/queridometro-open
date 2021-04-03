@@ -22,7 +22,10 @@ export default function History({ dates, votes }) {
   ): Promise<void> => {
     const _selectedDate = event.target.value;
     setSelectedDate(_selectedDate);
-    setVotesOnDate(votes[_selectedDate])
+    setVotesOnDate(votes[_selectedDate]);
+    
+    // altera a rota com shallow routing
+    router.push(`/history`, `/history/${_selectedDate}`, { shallow: true });
   };
 
   /**
