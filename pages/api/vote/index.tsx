@@ -60,7 +60,7 @@ export const postVote = async (
       votosGerados,
     )
     .then(() => {
-      res.status(200).end();
+      res.status(201).end();
       return res;
     })
     .catch(() => {
