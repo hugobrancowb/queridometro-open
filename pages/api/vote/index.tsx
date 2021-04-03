@@ -17,13 +17,19 @@ export default async (
   return res;
 };
 
+/**
+ * Computa soma de votos e sobe o total para o banco.
+ *
+ * @param req
+ * @param res
+ */
 export const postVote = async (
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<NextApiResponse> => {
   const userList: User[] = req.body?.userList;
   const valuesFromForm: GenericObject = req.body?.valuesFromForm;
-  
+
   // Confere senha
   if (valuesFromForm.password !== process.env.PASSPHRASE) {
     res.status(401).send({

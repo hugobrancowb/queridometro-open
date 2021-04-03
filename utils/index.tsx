@@ -1,13 +1,42 @@
 /**
  * Retorna a data de hoje.
- * @return Data no formato dd-MM-yyyy.
+ * @returns Data no formato dd-MM-yyyy.
  */
 export const dateNow = (): string => {
   const date = new Date();
-  const dateString = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`
+  const dateString = `${date.getDate()}-${
+    date.getMonth() + 1
+  }-${date.getFullYear()}`;
   return dateString
-      .replace(/(^[0-9]-)/g, "0$1")
-      .replace(/(-)([0-9]-)/g, "$10$2");
+    .replace(/(^[0-9]-)/g, '0$1')
+    .replace(/(-)([0-9]-)/g, '$10$2');
+};
+
+/**
+ * Orderna lista de datas por ordem cronológica - recentes primeiro.
+ *
+ * @param datas Lista ordernada alfabeticamente.
+ * @returns Lista ordenada cronologicamente - recentes primeiro.
+ */
+export const orderDates = (datas: string[]): string[] => {
+  return datas.sort((d1, d2) => {
+    const data1 = d1.split('-').map(el => Number(el));
+    const data2 = d2.split('-').map(el => Number(el));
+
+    // compara anos
+    if (data1[2] > data2[2]) return -1;
+    if (data2[2] > data1[2]) return 1;
+
+    // compara meses
+    if (data1[1] > data2[1]) return -1;
+    if (data2[1] > data1[1]) return 1;
+
+    // compara dias
+    if (data1[0] > data2[0]) return -1;
+    if (data2[0] > data1[0]) return 1;
+
+    return 0;
+  });
 };
 
 /**

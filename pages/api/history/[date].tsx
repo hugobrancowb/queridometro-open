@@ -8,7 +8,7 @@ export default async (
 ): Promise<NextApiResponse> => {
   const { method } = req;
   if (method === 'GET') {
-    return getHistoryFromDate(req, res);
+    return getHistoryByDate(req, res);
   }
 
   res.setHeader('Allow', ['GET']);
@@ -16,7 +16,13 @@ export default async (
   return res;
 };
 
-export const getHistoryFromDate = async (
+/**
+ * Obtém os votos de uma determinada data.
+ *
+ * @param req
+ * @param res
+ */
+export const getHistoryByDate = async (
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<NextApiResponse> => {
@@ -25,7 +31,6 @@ export const getHistoryFromDate = async (
   if (!isValidDate(date)) {
     res.status(400).end(`Formato inválido`);
   } else {
-  
     const body = await axios
       .get(`${process.env.NEXT_PUBLIC_FIREBASE_URL}/history/${date}.json`)
       .then(_res => _res?.data ?? []);

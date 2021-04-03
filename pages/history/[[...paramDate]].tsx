@@ -1,9 +1,10 @@
-import * as FirebaseService from '../../services/firebase-service';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import Head from 'next/head';
 import EmojiComponent from '../../components/emoji/emojiComponent';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import {orderDates} from "../../utils";
 
 export default function History({ dates, votes }) {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function History({ dates, votes }) {
     const _selectedDate = event.target.value;
     setSelectedDate(_selectedDate);
     setVotesOnDate(votes[_selectedDate]);
-    
+
     // altera a rota com shallow routing
     router.push(`/history`, `/history/${_selectedDate}`, { shallow: true });
   };
@@ -173,8 +174,10 @@ export default function History({ dates, votes }) {
  * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
  */
 export async function getServerSideProps() {
-  const votes = await FirebaseService.getAllVotes();
-  const dates = Object.keys(votes);
+  const votes = await axios
+    .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/history`)
+    .then(response => response?.data);
+  const dates = orderDates(Object.keys(votes));
 
   return {
     props: { dates, votes },
