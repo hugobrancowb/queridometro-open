@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import * as FirebaseService from '../../services/firebase-service';
 import * as Yup from 'yup';
 import SelectUser from '../../components/selectUser/selectUser';
 import { Emoji, GenericObject, User } from '../../models/models';
@@ -26,12 +25,16 @@ export default function Vote(props) {
 
   /** Loading state antes de uma mudança de página. */
   const [loading, setLoading] = useState<boolean>(false);
+  
   /** Usuário selecionado. */
   const [user, setUser] = useState<string | number>(null);
+  
   /** Algum usuário está selecionado? */
   const [isSelected, setIsSelected] = useState<boolean>(false);
+  
   /** Lista de usuários SEM o usuário selecionado. */
   const [filteredUserList, setFilteredUserList] = useState<User[]>([]);
+  
   /** Validação de formulário. */
   const [validationSchema, setValidationSchema] = useState<any>(
     Yup.object().shape({
@@ -53,7 +56,6 @@ export default function Vote(props) {
           userList,
         })
         .then(res => {
-          console.log('res: ', res);
           router.push('/');
         })
         .catch(err => {
@@ -78,6 +80,9 @@ export default function Vote(props) {
   const handleUserSelect = (event: ChangeEvent<HTMLInputElement>): void => {
     const selectedUser = event.target.value;
     setUser(selectedUser);
+
+    // altera a rota com shallow routing
+    router.push(`/vote`, `/vote/${selectedUser}`, { shallow: true });
   };
 
   /**
@@ -155,7 +160,7 @@ export default function Vote(props) {
   }, [paramUser]);
 
   /**
-   * [Effect]: user.
+   * [Effect]: Alterou-se o usuário que está votando atualmente.
    */
   useEffect(() => {
     if (user !== null) {
@@ -272,8 +277,12 @@ export default function Vote(props) {
 export async function getServerSideProps() {
   const title = process.env.NEXT_PUBLIC_TITLE;
   let [userList, emojisList] = await Promise.all([
-    FirebaseService.getUsers(),
-    FirebaseService.getEmojis(),
+    axios
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/users`)
+      .then(res => res?.data),
+    axios
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/emojis`)
+      .then(res => res?.data),
   ]);
 
   emojisList.forEach(emoji => (emoji.votes = 0));
