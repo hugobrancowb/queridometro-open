@@ -1,3 +1,11 @@
+import axios from 'axios';
+
+/**
+ * Fetcher para métodos GET.
+ * @param url URL da requisição.
+ */
+export const fetcher = (url): Promise<any> =>
+  axios.get(url).then(res => res?.data);
 /**
  * Retorna a data de hoje.
  * @returns Data no formato dd-MM-yyyy.
@@ -10,6 +18,24 @@ export const dateNow = (): string => {
   return dateString
     .replace(/(^[0-9]-)/g, '0$1')
     .replace(/(-)([0-9]-)/g, '$10$2');
+};
+
+/**
+ * Formata data recebida via parâmetro.
+ *
+ * @returns string Data no formato dd-MM-yyyy.
+ */
+export const formatDate = (date: string | string[]): string => {
+  if (date?.length === 1) return date[0];
+  
+  // Array com mais de um elemento significa ['dd', 'MM', 'yyyy'];
+  if (date?.length === 3)
+    return (date as string[]).reduce(
+        (formattedDate, el) => formattedDate + '-' + el,
+    );
+  
+  // Não foi recebido argumento algum ou os parâmetros foram inválidos.
+  return null;
 };
 
 /**

@@ -11,10 +11,7 @@ export default function SelectUser(
   return (
     <form>
       <div className="w-full md:max-w-xs md:mx-auto grid grid-rows-2">
-        <label
-          htmlFor="selectedUser"
-          className={`text-center`}
-        >
+        <label htmlFor="selectedUser" className={`text-center`}>
           Quem é você?
         </label>
         <select
@@ -22,16 +19,17 @@ export default function SelectUser(
           className="rounded-md"
           onChange={handler}
           value={user}
-          disabled={!(userList.length > 0)}
+          disabled={userList?.length === 0 || !userList}
         >
           <option disabled value={-1} key={-1}>
             Busque seu nome
           </option>
-          {userList.map((user, index) => (
-            <option value={user.name} key={user.name}>
-              {user.label}
-            </option>
-          ))}
+          {userList &&
+            userList.map((user, index) => (
+              <option value={user.name} key={user.name}>
+                {user.label}
+              </option>
+            ))}
         </select>
       </div>
     </form>

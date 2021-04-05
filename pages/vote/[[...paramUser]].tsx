@@ -1,21 +1,22 @@
 import Head from 'next/head';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import * as Yup from 'yup';
-import SelectUser from '../../components/selectUser/selectUser';
+import SelectUser from '../../components/selectUser/SelectUser';
 import { Emoji, GenericObject, User } from '@models';
 import { useFormik } from 'formik';
 import { Button } from '@dummy-system';
-import EmojiComponent from '../../components/emoji/emojiComponent';
+import EmojiComponent from '../../components/emoji/EmojiComponent';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
 import axios from 'axios';
+import { useGetEmojis, useGetUsers } from '@services';
 
-export default function Vote(props) {
+export default function Vote() {
   const router = useRouter();
   const { paramUser } = router.query;
 
-  const userList: User[] = props.userList;
-  const emojisList: Emoji[] = props.emojisList;
+  const { emojis: emojisList } = useGetEmojis();
+  const { users: userList } = useGetUsers(emojisList);
 
   const pageTitle = `Votação - ${process.env.NEXT_PUBLIC_TITLE}`;
 
@@ -58,7 +59,8 @@ export default function Vote(props) {
           userList,
         })
         .then(res => {
-          router.push('/');
+          const redirectUrl = res?.data?.url ?? '/';
+          router.push(redirectUrl);
         })
         .catch(err => {
           const { error } = err?.response?.data;
@@ -149,7 +151,7 @@ export default function Vote(props) {
    * [Effect]: Alterações no parâmetro User.
    */
   useEffect(() => {
-    if (!paramUser) return;
+    if (!paramUser || !userList) return;
 
     // temos um parâmetro
     const _selectThisUser = userList.find(user => user.name === paramUser[0]);
@@ -159,7 +161,7 @@ export default function Vote(props) {
       // usuário não encontrado: limpa a rota com shallow routing
       router.push('/vote', '/vote', { shallow: true });
     }
-  }, [paramUser]);
+  }, [paramUser, userList]);
 
   /**
    * [Effect]: Alterou-se o usuário que está votando atualmente.
@@ -271,33 +273,4 @@ export default function Vote(props) {
       </div>
     </>
   );
-}
-
-/**
- * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
- */
-export async function getServerSideProps() {
-  const title = process.env.NEXT_PUBLIC_TITLE;
-  let [userList, emojisList] = await Promise.all([
-    axios
-      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/users`)
-      .then(res => res?.data),
-    axios
-      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/emojis`)
-      .then(res => res?.data),
-  ]);
-
-  emojisList.forEach(emoji => (emoji.votes = 0));
-
-  userList.forEach(user => {
-    user.emojiList = emojisList;
-  });
-
-  return {
-    props: {
-      title,
-      userList,
-      emojisList,
-    },
-  };
 }
