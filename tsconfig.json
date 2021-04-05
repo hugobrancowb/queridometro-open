@@ -16,10 +16,10 @@
     "baseUrl": ".",
     "paths": {
       "@api": ["pages/api/*"],
-      "@components": ["components/*"],
+      "@components": ["components/index.tsx"],
       "@dummy-system": ["dummy-system/index.tsx"],
       "@models": ["models/index.tsx"],
-      "@services": ["services/*"],
+      "@services": ["services/index.tsx"],
       "@utils": ["utils/index.tsx"]
     }
   },

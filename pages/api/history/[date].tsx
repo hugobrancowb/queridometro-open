@@ -7,9 +7,7 @@ export default async (
   res: NextApiResponse,
 ): Promise<NextApiResponse> => {
   const { method } = req;
-  if (method === 'GET') {
-    return getHistoryByDate(req, res);
-  }
+  if (method === 'GET') return getHistoryByDate(req, res);
 
   res.setHeader('Allow', ['GET']);
   res.status(405).end(`Method ${method} not allowed.`);

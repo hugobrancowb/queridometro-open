@@ -1,23 +1,50 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
-import EmojiComponent from '../../components/emoji/emojiComponent';
+import { EmojiComponent } from '@components';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import axios from 'axios';
-import { orderDates } from '@utils';
 import { UserPlaceholder } from '@dummy-system';
+import { useGetHistory, useGetVotesFromDate } from '@services';
+import { formatDate } from '@utils';
 
-export default function History({ dates, votes }) {
+export default function History() {
+  const [selectedDate, setSelectedDate] = useState<string>('-1');
+
   const router = useRouter();
   const { paramDate } = router.query;
 
-  const [selectedDate, setSelectedDate] = useState<string>('-1');
-  const [votesOnDate, setVotesOnDate] = useState<any>([]);
+  const {
+    data: { dates },
+    loading: datesLoading,
+    error: datesError,
+  } = useGetHistory();
+
+  const {
+    data: votesOnDate,
+    loading: votesOnDateLoading,
+    error: votesOnDateError,
+  } = useGetVotesFromDate(selectedDate);
 
   const pageTitle = `Histórico - ${process.env.NEXT_PUBLIC_TITLE}`;
+  const placeholderQuantity = 6;
 
   /**
-   * Função responsável pelo efeito de "pisca" quando o conteúdo é alterado.
+   * Remove parâmetros da rota.
+   */
+  const clearPath = useCallback(
+    () => router.push('/history', '/history', { shallow: true }),
+    [paramDate],
+  );
+
+  /**
+   * Limpa data selecionada para valor inicial.
+   */
+  const clearSelectedDate = useCallback(() => setSelectedDate('-1'), [
+    selectedDate,
+  ]);
+
+  /**
+   * Atualiza data baseado no input.
    */
   const handleDateSelect = async (
     event: ChangeEvent<HTMLSelectElement>,
@@ -29,32 +56,32 @@ export default function History({ dates, votes }) {
    * @param date Data escolhida para exibição dos dados.
    */
   const updateVotes = async (date: string) => {
-    setVotesOnDate(null);
     setSelectedDate(date);
-    router.push(`/history`, `/history/${date}`, { shallow: true }).then();
 
-    const votesFromDate = await axios
-      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/history/${date}`)
-      .then(res => res?.data);
-
-    setVotesOnDate(votesFromDate);
+    // TODO: tentar reativar essa funcionalidade
+    // router.replace(`/history`, `/history/${date}`, { shallow: true }).then();
+    // router.push(`/history`, `/history/${date}`, { shallow: true }).then();
   };
 
   /**
-   * Formata data recebida via parâmetro.
-   * @returns string Data no formato dd-MM-yyyy.
+   * Gera uma lista de elementos placeholder para carregamento dos votos.
+   * @param size
    */
-  const formatParamDate = (): string => {
-    if (paramDate?.length === 1) return paramDate[0];
-
-    if (paramDate?.length === 3)
-      return (paramDate as string[]).reduce(
-        (formattedDate, el) => formattedDate + '-' + el,
-      );
-
-    // Não foi recebido argumento algum ou os parâmetros foram inválidos.
-    return null;
+  const fillWithUserPlaceholder = (size: number) => {
+    let output = [];
+    for (let i = 0; i < size; i++) output.push(<UserPlaceholder key={i} />);
+    return output;
   };
+
+  /**
+   * [Effect]: Quando a data selecionada não possui voto algum, considera-se como uma data inválida.
+   */
+  useEffect(() => {
+    if (votesOnDateError || votesOnDate?.length === 0) {
+      clearSelectedDate();
+      clearPath();
+    }
+  }, [votesOnDate, votesOnDateError]);
 
   /**
    * [Effect]: Run on init
@@ -63,20 +90,11 @@ export default function History({ dates, votes }) {
     if (!paramDate) return;
 
     // Data formatada
-    const _selectedDate: string = formatParamDate();
-    const _isValidDate: boolean = !!Object.keys(votes).find(
-      date => date === _selectedDate,
-    );
+    const validParamDate: string = formatDate(paramDate);
 
-    if (_selectedDate && _isValidDate) updateVotes(_selectedDate);
-    else router.push('/history', '/history', { shallow: true });
-  }, []);
-
-  function fillWithUserPlaceholder(size: number) {
-    let output = [];
-    for (let i = 0; i < size; i++) output.push(<UserPlaceholder key={i} />);
-    return output;
-  }
+    if (validParamDate) updateVotes(validParamDate).then();
+    else clearPath().then();
+  }, [paramDate]);
 
   return (
     <>
@@ -103,16 +121,17 @@ export default function History({ dates, votes }) {
             className="rounded-md"
             onChange={handleDateSelect}
             value={selectedDate}
-            disabled={!(dates.length > 0)}
+            disabled={datesLoading || datesError}
           >
             <option disabled value={'-1'} key={'-1'}>
               Selecione uma data
             </option>
-            {dates.map((date, index) => (
-              <option value={date} key={date}>
-                {date}
-              </option>
-            ))}
+            {dates &&
+              dates.map((date, index) => (
+                <option value={date} key={date}>
+                  {date}
+                </option>
+              ))}
           </select>
         </div>
       </div>
@@ -124,19 +143,18 @@ export default function History({ dates, votes }) {
           )}
         >
           {/* Placeholder de carregamento */}
-          {(!votesOnDate || votesOnDate?.length === 0) &&
+          {votesOnDateLoading &&
             selectedDate !== '-1' &&
-            fillWithUserPlaceholder(6)}
+            fillWithUserPlaceholder(placeholderQuantity)}
 
           {votesOnDate &&
-            votesOnDate?.length > 0 &&
             votesOnDate.map(person => (
               <div
                 key={'div:' + person?.name}
                 className={`row justify-start text-2xl items-center py-2 gap-1 grid grid-flow-col`}
               >
                 {/* Foto do participante */}
-                <div className="col-span-2 flex justify-center">
+                <div className="col-span-2 flex justify-center bg-gray-300 rounded-full">
                   <div
                     className="w-1/2 p-6 shadow rounded-full"
                     style={{
@@ -183,18 +201,4 @@ export default function History({ dates, votes }) {
       )
     </>
   );
-}
-
-/**
- * Busca pelos dados iniciais que populam a aplicação: Lista de usuários e lista de emojis.
- */
-export async function getServerSideProps() {
-  const votes = await axios
-    .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/history`)
-    .then(response => response?.data);
-  const dates = orderDates(Object.keys(votes));
-
-  return {
-    props: { dates, votes },
-  };
 }

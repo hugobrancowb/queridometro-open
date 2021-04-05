@@ -2,15 +2,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { GenericObject, User } from '@models';
 import axios from 'axios';
 import { dateNow } from '@utils';
+import { mutate } from 'swr';
 
 export default async (
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<NextApiResponse> => {
   const { method } = req;
-  if (method === 'POST') {
-    return postVote(req, res);
-  }
+  if (method === 'POST') return postVote(req, res);
 
   res.setHeader('Allow', ['POST']);
   res.status(405).end(`Method ${method} not allowed.`);
@@ -41,9 +40,8 @@ export const postVote = async (
   }
 
   const date = dateNow();
-  let votesFromToday: User[] = await axios
-    .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/history/${date}`)
-    .then(res => res?.data);
+  const urlToday = `${process.env.NEXT_PUBLIC_BASE_URL}/api/history/${date}`;
+  let votesFromToday: User[] = await axios.get(urlToday).then(res => res?.data);
 
   votesFromToday = votesFromToday?.length !== 0 ? votesFromToday : userList;
 
@@ -55,15 +53,13 @@ export const postVote = async (
   });
 
   return axios
-    .put(
-      `${process.env.FIREBASE_URL}/history/${date}.json`,
-      votosGerados,
-    )
+    .put(`${process.env.FIREBASE_URL}/history/${date}.json`, votosGerados)
     .then(() => {
-      res.status(201).end();
+      mutate(urlToday);
+      res.status(201).json({ url: `/history/${date}` });
       return res;
     })
-    .catch(() => {
+    .catch(error => {
       res.status(400).end();
       return res;
     });

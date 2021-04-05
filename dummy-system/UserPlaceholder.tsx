@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import EmojiComponent from '../components/emoji/emojiComponent';
+import EmojiComponent from '../components/emoji/EmojiComponent';
 import { Emoji } from '@models';
 import styled from 'styled-components';
 
